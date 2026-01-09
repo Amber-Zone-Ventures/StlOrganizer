@@ -1,0 +1,45 @@
+﻿<Window x:Class="StlOrganizer.Gui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StlOrganizer.Gui"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0"
+                 Text="{Binding TextFieldValue, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="10"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
+            <Button Content="Select Directory"
+                    Command="{Binding SelectDirectoryCommand}"
+                    Padding="10,5"/>
+            <TextBox Text="{Binding SelectedDirectory, Mode=OneWay}"
+                     IsReadOnly="True"
+                     MinWidth="300"
+                     Margin="10,0,0,0"
+                     VerticalContentAlignment="Center"/>
+        </StackPanel>
+
+        <Button Grid.Row="2"
+                Content="Decompress Files"
+                Command="{Binding DecompressFilesCommand}"
+                IsEnabled="{Binding IsDecompressing, Converter={StaticResource InverseBooleanConverter}}"
+                Margin="10"
+                Padding="10,5"
+                HorizontalAlignment="Left"/>
+
+        <TextBlock Grid.Row="3"
+                   Text="{Binding StatusMessage}"
+                   Margin="10"
+                   FontWeight="Bold"/>
+    </Grid>
+</Window>
