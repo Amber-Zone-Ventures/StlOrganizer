@@ -1,4 +1,4 @@
-﻿namespace StlOrganizer.Library;
+﻿namespace StlOrganizer.Library.SystemFileAdapters;
 
 public class FileOperationsAdapter : IFileOperations
 {
