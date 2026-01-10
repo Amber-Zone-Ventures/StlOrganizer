@@ -1,6 +1,7 @@
 ﻿using Serilog;
+using StlOrganizer.Library.SystemFileAdapters;
 
-namespace StlOrganizer.Library;
+namespace StlOrganizer.Library.ImageProcessing;
 
 public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperations, ILogger logger) : IImageOrganizer
 {
