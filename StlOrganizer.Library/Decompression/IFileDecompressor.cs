@@ -1,4 +1,4 @@
-namespace StlOrganizer.Library;
+namespace StlOrganizer.Library.Decompression;
 
 public interface IFileDecompressor
 {

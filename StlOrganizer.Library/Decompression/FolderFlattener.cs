@@ -1,4 +1,6 @@
-﻿namespace StlOrganizer.Library;
+﻿using StlOrganizer.Library.SystemFileAdapters;
+
+namespace StlOrganizer.Library.Decompression;
 
 public class FolderFlattener(IDirectoryService directoryService)
 {

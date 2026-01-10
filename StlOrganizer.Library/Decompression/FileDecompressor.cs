@@ -2,9 +2,10 @@ using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.Zip;
 using Serilog;
+using StlOrganizer.Library.SystemFileAdapters;
 using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
 
-namespace StlOrganizer.Library;
+namespace StlOrganizer.Library.Decompression;
 
 public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDecompressor
 {
