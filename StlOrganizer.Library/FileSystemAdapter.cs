@@ -13,6 +13,10 @@ public class FileSystemAdapter : IFileSystem
 
     public string GetDirectoryName(string path) => Path.GetDirectoryName(path) ?? string.Empty;
 
+    public string? GetParentDirectory(string path) => Path.GetDirectoryName(path);
+
+    public string CombinePaths(params string[] paths) => Path.Combine(paths);
+
     public string GetFileNameWithoutExtension(string path) => Path.GetFileNameWithoutExtension(path);
 
     public string GetExtension(string path) => Path.GetExtension(path);

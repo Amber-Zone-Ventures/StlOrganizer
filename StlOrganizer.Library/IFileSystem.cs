@@ -7,6 +7,8 @@ public interface IFileSystem
     string[] GetDirectories(string path);
     void CreateDirectory(string path);
     string GetDirectoryName(string path);
+    string? GetParentDirectory(string path);
+    string CombinePaths(params string[] paths);
     string GetFileNameWithoutExtension(string path);
     string GetExtension(string path);
     Stream OpenRead(string path);
