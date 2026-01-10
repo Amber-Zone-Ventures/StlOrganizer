@@ -1,11 +1,11 @@
 ﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace StlOrganizer.Gui;
+namespace StlOrganizer.Gui.Converters;
 
 public class InverseBooleanConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is bool boolValue)
         {
@@ -14,7 +14,7 @@ public class InverseBooleanConverter : IValueConverter
         return true;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is bool boolValue)
         {
