@@ -1,7 +1,8 @@
 ﻿using System.IO.Compression;
 using Serilog;
+using StlOrganizer.Library.SystemFileAdapters;
 
-namespace StlOrganizer.Library;
+namespace StlOrganizer.Library.Compression;
 
 public class FolderCompressor(
     IFileSystem fileSystem,
