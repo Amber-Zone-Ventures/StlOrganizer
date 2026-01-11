@@ -32,7 +32,7 @@ public class FileDecompressorLoggingTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns(new[] { zipFile });
-        A.CallTo(() => fileSystem.GetDirectoryName(zipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("corrupted");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
         A.CallTo(() => fileSystem.CreateDirectory(A<string>._)).Throws(new IOException("Disk full"));
@@ -54,7 +54,7 @@ public class FileDecompressorLoggingTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns(new[] { zipFile });
-        A.CallTo(() => fileSystem.GetDirectoryName(zipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("corrupted");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
         A.CallTo(() => fileSystem.CreateDirectory(A<string>._)).Throws(new IOException("Disk full"));
@@ -78,7 +78,7 @@ public class FileDecompressorLoggingTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns(new[] { zipFile });
-        A.CallTo(() => fileSystem.GetDirectoryName(zipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("corrupted");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
         A.CallTo(() => fileSystem.CreateDirectory(A<string>._)).Throws(expectedException);
@@ -101,7 +101,7 @@ public class FileDecompressorLoggingTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns(new[] { zipFile1, zipFile2 });
-        A.CallTo(() => fileSystem.GetDirectoryName(A<string>._)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(A<string>._)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile1)).Returns("corrupted1");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile2)).Returns("corrupted2");
         A.CallTo(() => fileSystem.GetExtension(A<string>._)).Returns(".zip");

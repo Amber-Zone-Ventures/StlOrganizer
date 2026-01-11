@@ -63,7 +63,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([zipFile]);
-        A.CallTo(() => fileSystem.GetDirectoryName(zipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("archive");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
         // Decompression will fail because zip file operations aren't mocked
@@ -97,7 +97,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([zipFile, "other.txt"]);
-        A.CallTo(() => fileSystem.GetDirectoryName(zipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("archive");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
         await decompressor.ScanAndDecompressAsync(directoryPath);
@@ -114,7 +114,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([gzipFile]);
-        A.CallTo(() => fileSystem.GetDirectoryName(gzipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(gzipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(gzipFile)).Returns("file");
         A.CallTo(() => fileSystem.GetExtension(gzipFile)).Returns(".gz");
         await decompressor.ScanAndDecompressAsync(directoryPath);
@@ -131,7 +131,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([tarFile]);
-        A.CallTo(() => fileSystem.GetDirectoryName(tarFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(tarFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(tarFile)).Returns("archive");
         A.CallTo(() => fileSystem.GetExtension(tarFile)).Returns(".tar");
         await decompressor.ScanAndDecompressAsync(directoryPath);
@@ -148,7 +148,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([tarGzFile]);
-        A.CallTo(() => fileSystem.GetDirectoryName(tarGzFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(tarGzFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(tarGzFile)).Returns("archive.tar");
         A.CallTo(() => fileSystem.GetExtension(tarGzFile)).Returns(".gz");
         await decompressor.ScanAndDecompressAsync(directoryPath);
@@ -166,7 +166,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([zipFile, gzFile]);
-        A.CallTo(() => fileSystem.GetDirectoryName(A<string>._)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(A<string>._)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("archive");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(gzFile)).Returns("file");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
@@ -186,7 +186,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([zipFile]);
-        A.CallTo(() => fileSystem.GetDirectoryName(zipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("archive");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
         await decompressor.ScanAndDecompressAsync(directoryPath);
@@ -204,7 +204,7 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
         A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
             .Returns([zipFile]);
-        A.CallTo(() => fileSystem.GetDirectoryName(zipFile)).Returns("C:\\TestDir");
+        A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns("C:\\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("ARCHIVE");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".ZIP");
         await decompressor.ScanAndDecompressAsync(directoryPath);
