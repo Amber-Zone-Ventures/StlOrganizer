@@ -15,7 +15,7 @@ public class FolderCompressor(
         if (!fileSystem.DirectoryExists(folderPath))
             throw new DirectoryNotFoundException($"Directory not found: {folderPath}");
 
-        var folderName = fileSystem.GetDirectoryName(folderPath);
+        var folderName = fileSystem.GetFolderName(folderPath);
         var parentDirectory = fileSystem.GetParentDirectory(folderPath) ?? folderPath;
 
         outputPath ??= fileSystem.CombinePaths(parentDirectory, $"{folderName}.zip");
@@ -60,7 +60,7 @@ public class FolderCompressor(
         var subdirectories = fileSystem.GetDirectories(directoryPath);
         foreach (var subdirectory in subdirectories)
         {
-            var subdirectoryName = fileSystem.GetDirectoryName(subdirectory);
+            var subdirectoryName = fileSystem.GetFolderName(subdirectory);
             var newEntryPrefix = string.IsNullOrEmpty(entryPrefix)
                 ? subdirectoryName
                 : fileSystem.CombinePaths(entryPrefix, subdirectoryName).Replace('\\', '/');
