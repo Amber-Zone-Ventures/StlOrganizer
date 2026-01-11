@@ -48,7 +48,7 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
     {
         var extractedFiles = new List<string>();
         var outputDirectory = Path.Combine(
-            fileSystem.GetDirectoryName(filePath),
+            fileSystem.GetFolderName(filePath),
             fileSystem.GetFileNameWithoutExtension(filePath));
 
         fileSystem.CreateDirectory(outputDirectory);
@@ -88,7 +88,7 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
             if (!entry.IsFile) continue;
 
             var entryFileName = Path.Combine(outputDirectory, entry.Name);
-            var directoryName = fileSystem.GetDirectoryName(entryFileName);
+            var directoryName = fileSystem.GetFolderName(entryFileName);
 
             if (!string.IsNullOrEmpty(directoryName))
             {
