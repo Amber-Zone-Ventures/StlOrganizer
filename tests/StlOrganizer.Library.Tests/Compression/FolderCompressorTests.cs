@@ -23,7 +23,7 @@ public class FolderCompressorTests
         logger = A.Fake<ILogger>();
         compressor = new FolderCompressor(fileSystem, fileOperations, zipArchiveFactory, logger);
     }
-
+    
     [Fact]
     public void CompressFolder_WhenDirectoryDoesNotExist_ThrowsDirectoryNotFoundException()
     {
@@ -41,7 +41,7 @@ public class FolderCompressorTests
         var archive = A.Fake<IZipArchive>();
 
         A.CallTo(() => fileSystem.DirectoryExists(folderPath)).Returns(true);
-        A.CallTo(() => fileSystem.GetDirectoryName(folderPath)).Returns("TestDir");
+        A.CallTo(() => fileSystem.GetDirectoryName(folderPath)).Returns(folderPath);
         A.CallTo(() => fileSystem.GetParentDirectory(folderPath)).Returns(@"C:\");
         A.CallTo(() => fileSystem.CombinePaths(@"C:\", "TestDir.zip")).Returns(outputPath);
         A.CallTo(() => fileOperations.FileExists(outputPath)).Returns(false);
@@ -52,6 +52,27 @@ public class FolderCompressorTests
         compressor.CompressFolder(folderPath);
 
         A.CallTo(() => fileSystem.DirectoryExists(folderPath)).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public void CompressFolder_WhenTheFolderIsASubFolder_ItUsesTheSubfolder()
+    {
+        const string folderPath = @"C:\MyFolder\Target";
+        const string expectedOutput = @"C:\MyFolder\Target.zip";
+        var archive = A.Fake<IZipArchive>();
+
+        A.CallTo(() => fileSystem.DirectoryExists(folderPath)).Returns(true);
+        A.CallTo(() => fileSystem.GetDirectoryName(folderPath)).Returns("MyFolder");
+        A.CallTo(() => fileSystem.GetParentDirectory(folderPath)).Returns(@"C:\");
+        A.CallTo(() => fileSystem.CombinePaths(@"C:\", "MyFolder.zip")).Returns(expectedOutput);
+        A.CallTo(() => fileOperations.FileExists(expectedOutput)).Returns(false);
+        A.CallTo(() => zipArchiveFactory.Open(expectedOutput, ZipArchiveMode.Create)).Returns(archive);
+        A.CallTo(() => fileSystem.GetFiles(folderPath, "*.*", SearchOption.TopDirectoryOnly)).Returns([]);
+        A.CallTo(() => fileSystem.GetDirectories(folderPath)).Returns([]);
+
+        var result = compressor.CompressFolder(folderPath);
+
+        result.ShouldBe(expectedOutput);
     }
 
     [Fact]
@@ -74,6 +95,8 @@ public class FolderCompressorTests
 
         result.ShouldBe(expectedOutput);
     }
+    
+    
 
     [Fact]
     public void CompressFolder_WhenOutputPathProvided_UsesProvidedPath()
