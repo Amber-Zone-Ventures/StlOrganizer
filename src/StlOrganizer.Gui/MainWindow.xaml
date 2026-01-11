@@ -15,10 +15,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0"
-                 Text="{Binding TextFieldValue, UpdateSourceTrigger=PropertyChanged}"
-                 Margin="10"/>
-
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
             <Button Content="Select Directory"
                     Command="{Binding SelectDirectoryCommand}"
