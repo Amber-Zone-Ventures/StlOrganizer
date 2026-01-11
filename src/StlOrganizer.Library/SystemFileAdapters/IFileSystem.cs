@@ -6,7 +6,7 @@ public interface IFileSystem
     IEnumerable<string> GetFiles(string path, string searchPattern, SearchOption searchOption);
     string[] GetDirectories(string path);
     void CreateDirectory(string path);
-    string GetDirectoryName(string path);
+    string GetFolderName(string path);
     string? GetParentDirectory(string path);
     string CombinePaths(params string[] paths);
     string GetFileNameWithoutExtension(string path);
