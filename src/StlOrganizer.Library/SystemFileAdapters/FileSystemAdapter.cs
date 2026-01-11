@@ -1,6 +1,6 @@
 ﻿namespace StlOrganizer.Library.SystemFileAdapters;
 
-public class FileSystemAdapter : IFileSystem
+public class FileSystemAdapter(IFileOperations fileOperations) : IFileSystem
 {
     public bool DirectoryExists(string path) => Directory.Exists(path);
 
