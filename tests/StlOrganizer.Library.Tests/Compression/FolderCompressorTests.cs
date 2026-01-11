@@ -233,24 +233,18 @@ public class FolderCompressorTests
         A.CallTo(() => fileOperations.FileExists(outputPath)).Returns(false);
         A.CallTo(() => zipArchiveFactory.Open(outputPath, ZipArchiveMode.Create)).Returns(archive);
 
-        // Root level - entryPrefix is empty string at start
         A.CallTo(() => fileSystem.GetFiles(folderPath, "*.*", SearchOption.TopDirectoryOnly)).Returns([]);
         A.CallTo(() => fileSystem.GetDirectories(folderPath)).Returns([subDir]);
         A.CallTo(() => fileSystem.GetFolderName(subDir)).Returns("Folder");
-        // newEntryPrefix becomes "Folder" (no CombinePaths call since entryPrefix is empty)
 
-        // Folder level - entryPrefix is now "Folder"
         A.CallTo(() => fileSystem.GetFiles(subDir, "*.*", SearchOption.TopDirectoryOnly)).Returns([]);
         A.CallTo(() => fileSystem.GetDirectories(subDir)).Returns([nestedDir]);
         A.CallTo(() => fileSystem.GetFolderName(nestedDir)).Returns("Nested");
         A.CallTo(() => fileSystem.CombinePaths("Folder", "Nested")).Returns(@"Folder\Nested");
-        // newEntryPrefix becomes "Folder\Nested" then .Replace('\\', '/') = "Folder/Nested"
 
-        // Nested level - entryPrefix is now "Folder/Nested"
         A.CallTo(() => fileSystem.GetFiles(nestedDir, "*.*", SearchOption.TopDirectoryOnly)).Returns([file]);
         A.CallTo(() => fileOperations.GetFileName(file)).Returns("deep.txt");
         A.CallTo(() => fileSystem.CombinePaths("Folder/Nested", "deep.txt")).Returns(@"Folder/Nested\deep.txt");
-        // entryName becomes "Folder/Nested\deep.txt".Replace('\\', '/') = "Folder/Nested/deep.txt"
         A.CallTo(() => fileSystem.GetDirectories(nestedDir)).Returns([]);
 
         compressor.CompressFolder(folderPath);
@@ -377,24 +371,18 @@ public class FolderCompressorTests
         A.CallTo(() => fileOperations.FileExists(outputPath)).Returns(false);
         A.CallTo(() => zipArchiveFactory.Open(outputPath, ZipArchiveMode.Create)).Returns(archive);
 
-        // Root - entryPrefix starts as empty
         A.CallTo(() => fileSystem.GetFiles(folderPath, "*.*", SearchOption.TopDirectoryOnly)).Returns([]);
         A.CallTo(() => fileSystem.GetDirectories(folderPath)).Returns([@"C:\MyFolder\Sub"]);
         A.CallTo(() => fileSystem.GetFolderName(@"C:\MyFolder\Sub")).Returns("Sub");
-        // newEntryPrefix becomes "Sub"
 
-        // Sub - entryPrefix is "Sub"
         A.CallTo(() => fileSystem.GetFiles(@"C:\MyFolder\Sub", "*.*", SearchOption.TopDirectoryOnly)).Returns([]);
         A.CallTo(() => fileSystem.GetDirectories(@"C:\MyFolder\Sub")).Returns([subDir]);
         A.CallTo(() => fileSystem.GetFolderName(subDir)).Returns("Dir");
         A.CallTo(() => fileSystem.CombinePaths("Sub", "Dir")).Returns(@"Sub\Dir");
-        // newEntryPrefix becomes "Sub\Dir".Replace('\\', '/') = "Sub/Dir"
 
-        // Dir - entryPrefix is "Sub/Dir"
         A.CallTo(() => fileSystem.GetFiles(subDir, "*.*", SearchOption.TopDirectoryOnly)).Returns([file]);
         A.CallTo(() => fileOperations.GetFileName(file)).Returns("file.txt");
         A.CallTo(() => fileSystem.CombinePaths("Sub/Dir", "file.txt")).Returns(@"Sub/Dir\file.txt");
-        // entryName becomes "Sub/Dir\file.txt".Replace('\\', '/') = "Sub/Dir/file.txt"
         A.CallTo(() => fileSystem.GetDirectories(subDir)).Returns([]);
 
         compressor.CompressFolder(folderPath);
