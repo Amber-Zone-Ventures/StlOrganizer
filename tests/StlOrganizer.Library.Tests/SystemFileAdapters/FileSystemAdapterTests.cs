@@ -16,8 +16,16 @@ public class FileSystemAdapterTests
         A.CallTo(() => fileSystem.FileExists(path)).Returns(exists);
         var sut = new FileSystemAdapter(fileSystem);
 
-        var output = sut.GetDirectoryName(path);
+        var output = sut.GetFolderName(path);
         
         output.ShouldBe(expected);
+    }
+
+    [Fact]
+    public void GetDirectoryName_WhenThePathIsEmpty_ShouldThrowAnException()
+    {
+        var sut = new FileSystemAdapter(A.Fake<IFileOperations>());
+        
+        Should.Throw<ArgumentException>(() => sut.GetFolderName(string.Empty));
     }
 }

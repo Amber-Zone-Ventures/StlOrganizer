@@ -11,7 +11,7 @@ public class FileSystemAdapter(IFileOperations fileOperations) : IFileSystem
 
     public void CreateDirectory(string path) => Directory.CreateDirectory(path);
 
-    public string GetDirectoryName(string path)
+    public string GetFolderName(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException("Path cannot be null or empty.", nameof(path));
