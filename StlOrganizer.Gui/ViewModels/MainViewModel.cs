@@ -7,9 +7,9 @@ namespace StlOrganizer.Gui.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly OperationSelector operationSelector;
+    private readonly IOperationSelector operationSelector;
 
-    public MainViewModel(OperationSelector operationSelector)
+    public MainViewModel(IOperationSelector operationSelector)
     {
         this.operationSelector = operationSelector;
         AvailableOperations =

@@ -38,7 +38,7 @@ public partial class App : Application
         services.AddSingleton<FileDecompressor>();
         services.AddSingleton<ImageOrganizer>();
         services.AddSingleton<FolderCompressor>();
-        services.AddSingleton<OperationSelector>();
+        services.AddSingleton<IOperationSelector, OperationSelector>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<MainWindow>();
     }
