@@ -52,8 +52,8 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void SelectDirectory()
     {
-        var dialog = new Microsoft.Win32.OpenFolderDialog();
-        
+        var dialog = new OpenFolderDialog();
+
         if (dialog.ShowDialog() == true) SelectedDirectory = dialog.FolderName;
     }
 
@@ -67,13 +67,14 @@ public partial class MainViewModel : ObservableObject
         }
 
         using var tokenSource = new CancellationTokenSource();
-        
+
         try
         {
             IsBusy = true;
             StatusMessage = $"Executing {SelectedOperation}...";
 
-            var result = await operationSelector.ExecuteOperationAsync(SelectedOperation, SelectedDirectory, tokenSource.Token);
+            var result =
+                await operationSelector.ExecuteOperationAsync(SelectedOperation, SelectedDirectory, tokenSource.Token);
             StatusMessage = result;
         }
         catch (Exception ex)
