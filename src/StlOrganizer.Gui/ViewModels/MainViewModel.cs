@@ -67,7 +67,8 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var tokenSource = new CancellationTokenSource();
+        using var tokenSource = new CancellationTokenSource();
+        
         try
         {
             IsBusy = true;
@@ -83,8 +84,6 @@ public partial class MainViewModel : ObservableObject
         finally
         {
             IsBusy = false;
-            tokenSource.Dispose();
         }
-
     }
 }
