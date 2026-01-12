@@ -22,7 +22,7 @@ public class MainViewModelTests
         viewModel.Title.ShouldBe("Stl Organizer");
         viewModel.TextFieldValue.ShouldBe(string.Empty);
         viewModel.SelectedDirectory.ShouldBe(string.Empty);
-        viewModel.IsExecuting.ShouldBeFalse();
+        viewModel.IsBusy.ShouldBeFalse();
         viewModel.StatusMessage.ShouldBe(string.Empty);
     }
 
@@ -58,7 +58,7 @@ public class MainViewModelTests
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
         viewModel.StatusMessage.ShouldBe("Please select a directory first.");
-        viewModel.IsExecuting.ShouldBeFalse();
+        viewModel.IsBusy.ShouldBeFalse();
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class MainViewModelTests
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
         viewModel.StatusMessage.ShouldBe("Please select a directory first.");
-        viewModel.IsExecuting.ShouldBeFalse();
+        viewModel.IsBusy.ShouldBeFalse();
     }
 
     [Fact]
@@ -80,12 +80,12 @@ public class MainViewModelTests
         viewModel.SelectedDirectory = directory;
         viewModel.SelectedOperation = OperationType.ImageOrganizer;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.ImageOrganizer, directory))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.ImageOrganizer, directory, A<CancellationToken>._))
             .Returns(Task.FromResult(expectedResult));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.ImageOrganizer, directory))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.ImageOrganizer, directory, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
         viewModel.StatusMessage.ShouldBe(expectedResult);
     }
@@ -97,17 +97,17 @@ public class MainViewModelTests
         viewModel.SelectedDirectory = directory;
         var executionStarted = false;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._, A<CancellationToken>._))
             .ReturnsLazily(() =>
             {
-                executionStarted = viewModel.IsExecuting;
+                executionStarted = viewModel.IsBusy;
                 return Task.FromResult("Success");
             });
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
         executionStarted.ShouldBeTrue();
-        viewModel.IsExecuting.ShouldBeFalse();
+        viewModel.IsBusy.ShouldBeFalse();
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class MainViewModelTests
         viewModel.SelectedDirectory = directory;
         viewModel.SelectedOperation = OperationType.FolderCompressor;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._, A<CancellationToken>._))
             .Returns(Task.FromResult("Done"));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
@@ -132,13 +132,13 @@ public class MainViewModelTests
         const string exceptionMessage = "Test exception";
         viewModel.SelectedDirectory = directory;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._, A<CancellationToken>._))
             .Throws(new InvalidOperationException(exceptionMessage));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
         viewModel.StatusMessage.ShouldBe($"Error: {exceptionMessage}");
-        viewModel.IsExecuting.ShouldBeFalse();
+        viewModel.IsBusy.ShouldBeFalse();
     }
 
     [Fact]
@@ -147,12 +147,12 @@ public class MainViewModelTests
         const string directory = @"C:\TestDir";
         viewModel.SelectedDirectory = directory;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<OperationType>._, A<string>._, A<CancellationToken>._))
             .Throws(new Exception("Test error"));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
-        viewModel.IsExecuting.ShouldBeFalse();
+        viewModel.IsBusy.ShouldBeFalse();
     }
 
     [Fact]
@@ -194,19 +194,19 @@ public class MainViewModelTests
         // Test FileDecompressor
         viewModel.SelectedOperation = OperationType.FileDecompressor;
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.FileDecompressor, directory))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.FileDecompressor, directory, A<CancellationToken>._))
             .MustHaveHappened();
 
         // Test FolderCompressor
         viewModel.SelectedOperation = OperationType.FolderCompressor;
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.FolderCompressor, directory))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.FolderCompressor, directory, A<CancellationToken>._))
             .MustHaveHappened();
 
         // Test ImageOrganizer
         viewModel.SelectedOperation = OperationType.ImageOrganizer;
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.ImageOrganizer, directory))
+        A.CallTo(() => operationSelector.ExecuteOperationAsync(OperationType.ImageOrganizer, directory, A<CancellationToken>._))
             .MustHaveHappened();
     }
 }
