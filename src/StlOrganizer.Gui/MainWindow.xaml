@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StlOrganizer.Gui"
+        xmlns:vm="clr-namespace:StlOrganizer.Gui.ViewModels"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -38,10 +40,18 @@
         <Button Grid.Row="3"
                 Content="Execute Operation"
                 Command="{Binding ExecuteOperationCommand}"
-                IsEnabled="{Binding IsExecuting, Converter={StaticResource InverseBooleanConverter}}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
                 Margin="10"
                 Padding="10,5"
                 HorizontalAlignment="Left"/>
+
+        <ProgressBar Grid.Row="4"
+                     Margin="10"
+            Minimum="0"
+            Maximum="1"
+            Value="{Binding Progress}"
+            Visibility="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}" />
+
 
         <TextBlock Grid.Row="4"
                    Text="{Binding StatusMessage}"
