@@ -95,9 +95,11 @@ public partial class MainViewModel : ObservableValidator
     [RelayCommand]
     private async Task ExecuteOperationAsync()
     {
-        if (string.IsNullOrWhiteSpace(SelectedDirectory))
+        ValidateAllProperties();
+        UpdateStatusMessageFromValidation();
+
+        if (HasErrors)
         {
-            StatusMessage = "Please select a directory first.";
             return;
         }
 
