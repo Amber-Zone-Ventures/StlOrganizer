@@ -26,7 +26,7 @@ public class MainViewModelTests
         viewModel.TextFieldValue.ShouldBe(string.Empty);
         viewModel.SelectedDirectory.ShouldBe(string.Empty);
         viewModel.IsBusy.ShouldBeFalse();
-        viewModel.StatusMessage.ShouldBe(string.Empty);
+        viewModel.StatusMessage.ShouldBe("Directory is required.");
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class MainViewModelTests
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
-        viewModel.StatusMessage.ShouldBe("Please select a directory first.");
+        viewModel.StatusMessage.ShouldBe("Directory is required.");
         viewModel.IsBusy.ShouldBeFalse();
     }
 
@@ -71,7 +71,7 @@ public class MainViewModelTests
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
-        viewModel.StatusMessage.ShouldBe("Please select a directory first.");
+        viewModel.StatusMessage.ShouldBe("Directory is required.");
         viewModel.IsBusy.ShouldBeFalse();
     }
 
