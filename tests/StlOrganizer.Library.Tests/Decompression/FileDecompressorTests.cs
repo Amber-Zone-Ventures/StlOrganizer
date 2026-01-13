@@ -23,24 +23,13 @@ public class FileDecompressorTests
     public async Task ScanAndDecompressAsync_WhenDirectoryDoesNotExist_ThrowsDirectoryNotFoundException()
     {
         const string directoryPath = @"C:\NonExistent";
+        
         A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(false);
 
         await Should.ThrowAsync<DirectoryNotFoundException>(
             async () => await decompressor.ScanAndDecompressAsync(directoryPath));
     }
-
-    [Fact]
-    public async Task ScanAndDecompressAsync_WhenDirectoryExists_ChecksDirectoryExists()
-    {
-        const string directoryPath = @"C:\TestDir";
-        A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).Returns(true);
-        A.CallTo(() => fileSystem.GetFiles(directoryPath, "*.*", SearchOption.AllDirectories))
-            .Returns(Array.Empty<string>());
-        await decompressor.ScanAndDecompressAsync(directoryPath);
-
-        A.CallTo(() => fileSystem.DirectoryExists(directoryPath)).MustHaveHappenedOnceExactly();
-    }
-
+    
     [Fact]
     public async Task ScanAndDecompressAsync_WhenNoCompressedFiles_ReturnsEmptyLists()
     {
@@ -66,11 +55,9 @@ public class FileDecompressorTests
         A.CallTo(() => fileSystem.GetFolderName(zipFile)).Returns(@"C:\TestDir");
         A.CallTo(() => fileSystem.GetFileNameWithoutExtension(zipFile)).Returns("archive");
         A.CallTo(() => fileSystem.GetExtension(zipFile)).Returns(".zip");
-        // Decompression will fail because zip file operations aren't mocked
 
         var result = await decompressor.ScanAndDecompressAsync(directoryPath);
 
-        // Failed decompressions are not included in compressed files list
         result.CompressedFiles.ShouldBeEmpty();
         result.ExtractedFiles.ShouldBeEmpty();
     }

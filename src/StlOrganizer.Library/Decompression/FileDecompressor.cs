@@ -52,9 +52,10 @@ public class FileDecompressor(
     private async Task<List<string>> DecompressFileAsync(string filePath, CancellationToken cancellationToken)
     {
         var extractedFiles = new List<string>();
-        var outputDirectory = Path.Combine(
-            fileSystem.GetParentDirectory(filePath)!,
-            fileSystem.GetFileNameWithoutExtension(filePath));
+        var parent = fileSystem.GetParentDirectory(filePath);
+        var nameWithoutExtension = fileSystem.GetFileNameWithoutExtension(filePath);
+
+        var outputDirectory = fileSystem.CombinePaths(parent!, nameWithoutExtension);
 
         fileSystem.CreateDirectory(outputDirectory);
 
@@ -88,6 +89,7 @@ public class FileDecompressor(
         var extractedFiles = new List<string>();
 
         using var zipFile = new ZipFile(zipPath);
+
         foreach (ZipEntry entry in zipFile)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -97,9 +99,7 @@ public class FileDecompressor(
             var directoryName = fileSystem.GetFolderName(entryFileName);
 
             if (!string.IsNullOrEmpty(directoryName))
-            {
                 fileSystem.CreateDirectory(directoryName);
-            }
 
             using var zipStream = zipFile.GetInputStream(entry);
             using var outputStream = fileSystem.CreateFile(entryFileName);
