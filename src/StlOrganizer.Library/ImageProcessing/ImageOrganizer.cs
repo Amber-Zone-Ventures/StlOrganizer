@@ -12,7 +12,7 @@ public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperatio
 
     private const string ImagesFolderName = "Images";
 
-    public async Task<int> OrganizeImagesAsync(string rootPath)
+    public async Task<int> OrganizeImagesAsync(string rootPath, CancellationToken cancellationToken = default)
     {
         if (!fileSystem.DirectoryExists(rootPath))
         {
@@ -26,14 +26,14 @@ public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperatio
 
         await Task.Run(() =>
         {
-            copiedCount = ScanAndCopyImages(rootPath, imagesFolder);
-        });
+            copiedCount = ScanAndCopyImages(rootPath, imagesFolder, cancellationToken);
+        }, cancellationToken);
 
         logger.Information("Organized {CopiedCount} image(s) into {ImagesFolder}", copiedCount, imagesFolder);
         return copiedCount;
     }
 
-    private int ScanAndCopyImages(string currentPath, string imagesFolder)
+    private int ScanAndCopyImages(string currentPath, string imagesFolder, CancellationToken cancellationToken)
     {
         var copiedCount = 0;
 
@@ -44,6 +44,7 @@ public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperatio
         
         foreach (var file in files)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (IsImageFile(file))
             {
                 try
@@ -62,7 +63,8 @@ public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperatio
         var subdirectories = fileSystem.GetDirectories(currentPath);
         foreach (var subdirectory in subdirectories)
         {
-            copiedCount += ScanAndCopyImages(subdirectory, imagesFolder);
+            cancellationToken.ThrowIfCancellationRequested();
+            copiedCount += ScanAndCopyImages(subdirectory, imagesFolder, cancellationToken);
         }
 
         return copiedCount;
