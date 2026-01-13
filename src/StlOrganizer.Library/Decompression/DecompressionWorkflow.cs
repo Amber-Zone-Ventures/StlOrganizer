@@ -9,16 +9,17 @@ public class DecompressionWorkflow(
     IFileOperations fileOperations,
     ILogger logger) : IDecompressionWorkflow
 {
-    public async Task<IEnumerable<string>> ExecuteAsync(string directoryPath, bool deleteOriginalFiles = false)
+    public async Task<IEnumerable<string>> ExecuteAsync(string directoryPath, bool deleteOriginalFiles = false, CancellationToken cancellationToken = default)
     {
         logger.Information("Starting decompression workflow for {DirectoryPath}", directoryPath);
 
         // Step 1: Decompress all files
-        var result = await fileDecompressor.ScanAndDecompressAsync(directoryPath);
+        var result = await fileDecompressor.ScanAndDecompressAsync(directoryPath, cancellationToken);
         var fileCount = result.ExtractedFiles.Count();
         logger.Information("Decompressed {FileCount} files", fileCount);
 
         // Step 2: Flatten nested folders
+        cancellationToken.ThrowIfCancellationRequested();
         folderFlattener.RemoveNestedFolders(directoryPath);
         logger.Information("Completed folder flattening for {DirectoryPath}", directoryPath);
 
@@ -27,6 +28,7 @@ public class DecompressionWorkflow(
         {
             foreach (var compressedFile in result.CompressedFiles)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
                     fileOperations.DeleteFile(compressedFile);

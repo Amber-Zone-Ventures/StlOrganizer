@@ -14,7 +14,7 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
         ".zip", ".gz", ".7z", ".rar", ".tar", ".tar.gz", ".tgz"
     ];
 
-    public async Task<DecompressionResult> ScanAndDecompressAsync(string directoryPath)
+    public async Task<DecompressionResult> ScanAndDecompressAsync(string directoryPath, CancellationToken cancellationToken = default)
     {
         if (!fileSystem.DirectoryExists(directoryPath))
         {
@@ -29,13 +29,14 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
 
         foreach (var compressedFile in compressedFiles)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                var extractedFiles = await DecompressFileAsync(compressedFile);
+                var extractedFiles = await DecompressFileAsync(compressedFile, cancellationToken);
                 decompressedFiles.AddRange(extractedFiles);
                 compressedFilesList.Add(compressedFile);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 logger.Error(ex, "Failed to decompress {CompressedFile}", compressedFile);
             }
@@ -44,7 +45,7 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
         return new DecompressionResult(decompressedFiles, compressedFilesList);
     }
 
-    private async Task<List<string>> DecompressFileAsync(string filePath)
+    private async Task<List<string>> DecompressFileAsync(string filePath, CancellationToken cancellationToken)
     {
         var extractedFiles = new List<string>();
         var outputDirectory = Path.Combine(
@@ -59,32 +60,33 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
         {
             if (extension == ".zip")
             {
-                extractedFiles.AddRange(DecompressZip(filePath, outputDirectory));
+                extractedFiles.AddRange(DecompressZip(filePath, outputDirectory, cancellationToken));
             }
             else if (extension == ".gz" || extension == ".tgz")
             {
-                extractedFiles.AddRange(DecompressGZip(filePath, outputDirectory));
+                extractedFiles.AddRange(DecompressGZip(filePath, outputDirectory, cancellationToken));
             }
             else if (filePath.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase))
             {
-                extractedFiles.AddRange(DecompressTarGz(filePath, outputDirectory));
+                extractedFiles.AddRange(DecompressTarGz(filePath, outputDirectory, cancellationToken));
             }
             else if (extension == ".tar")
             {
-                extractedFiles.AddRange(DecompressTar(filePath, outputDirectory));
+                extractedFiles.AddRange(DecompressTar(filePath, outputDirectory, cancellationToken));
             }
-        });
+        }, cancellationToken);
 
         return extractedFiles;
     }
 
-    private List<string> DecompressZip(string zipPath, string outputDirectory)
+    private List<string> DecompressZip(string zipPath, string outputDirectory, CancellationToken cancellationToken)
     {
         var extractedFiles = new List<string>();
 
         using var zipFile = new ZipFile(zipPath);
         foreach (ZipEntry entry in zipFile)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (!entry.IsFile) continue;
 
             var entryFileName = Path.Combine(outputDirectory, entry.Name);
@@ -104,7 +106,7 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
         return extractedFiles;
     }
 
-    private List<string> DecompressGZip(string gzipPath, string outputDirectory)
+    private List<string> DecompressGZip(string gzipPath, string outputDirectory, CancellationToken cancellationToken)
     {
         var outputFileName = Path.Combine(outputDirectory,
             fileSystem.GetFileNameWithoutExtension(gzipPath));
@@ -112,17 +114,21 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
         using var inputStream = fileSystem.OpenRead(gzipPath);
         using var gzipStream = new GZipInputStream(inputStream);
         using var outputStream = fileSystem.CreateFile(outputFileName);
+        
+        cancellationToken.ThrowIfCancellationRequested();
         gzipStream.CopyTo(outputStream);
 
         return [outputFileName];
     }
 
-    private List<string> DecompressTar(string tarPath, string outputDirectory)
+    private List<string> DecompressTar(string tarPath, string outputDirectory, CancellationToken cancellationToken)
     {
         var extractedFiles = new List<string>();
 
         using var inputStream = fileSystem.OpenRead(tarPath);
         using var tarArchive = TarArchive.CreateInputTarArchive(inputStream, null);
+        
+        cancellationToken.ThrowIfCancellationRequested();
         tarArchive.ExtractContents(outputDirectory);
 
         // Get all extracted files
@@ -131,13 +137,15 @@ public class FileDecompressor(IFileSystem fileSystem, ILogger logger) : IFileDec
         return extractedFiles;
     }
 
-    private List<string> DecompressTarGz(string tarGzPath, string outputDirectory)
+    private List<string> DecompressTarGz(string tarGzPath, string outputDirectory, CancellationToken cancellationToken)
     {
         var extractedFiles = new List<string>();
 
         using var inputStream = fileSystem.OpenRead(tarGzPath);
         using var gzipStream = new GZipInputStream(inputStream);
         using var tarArchive = TarArchive.CreateInputTarArchive(gzipStream, null);
+        
+        cancellationToken.ThrowIfCancellationRequested();
         tarArchive.ExtractContents(outputDirectory);
 
         extractedFiles.AddRange(fileSystem.GetFiles(outputDirectory, "*.*", SearchOption.AllDirectories));
