@@ -13,35 +13,35 @@ public class OperationSelector(
 {
     public async Task<string> ExecuteOperationAsync(FileOperation operationType,
         string directoryPath,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         return operationType switch
         {
-            _ when operationType == FileOperation.DecompressFiles => await ExecuteFileDecompressorAsync(directoryPath),
-            _ when operationType == FileOperation.CompressFolder => await ExecuteFolderCompressorAsync(directoryPath),
-            _ when operationType == FileOperation.ExtractImages => await ExecuteImageOrganizerAsync(directoryPath),
+            _ when operationType == FileOperation.DecompressFiles => await ExecuteFileDecompressorAsync(directoryPath, cancellationToken),
+            _ when operationType == FileOperation.CompressFolder => await ExecuteFolderCompressorAsync(directoryPath, cancellationToken),
+            _ when operationType == FileOperation.ExtractImages => await ExecuteImageOrganizerAsync(directoryPath, cancellationToken),
             _ => throw new ArgumentException($"Unknown operation type: {operationType.Name}")
         };
     }
 
-    private async Task<string> ExecuteFileDecompressorAsync(string directoryPath)
+    private async Task<string> ExecuteFileDecompressorAsync(string directoryPath, CancellationToken cancellationToken)
     {
-        var extractedFiles = await decompressionWorkflow.ExecuteAsync(directoryPath, false);
+        var extractedFiles = await decompressionWorkflow.ExecuteAsync(directoryPath, false, cancellationToken);
         var fileCount = extractedFiles.Count();
         logger.Information("DecompressionWorkflow extracted {fileCount} files", fileCount);
         return $"Successfully extracted {fileCount} file(s) and flattened folders.";
     }
 
-    private Task<string> ExecuteFolderCompressorAsync(string directoryPath)
+    private Task<string> ExecuteFolderCompressorAsync(string directoryPath, CancellationToken cancellationToken)
     {
-        var outputPath = folderCompressor.CompressFolder(directoryPath);
+        var outputPath = folderCompressor.CompressFolder(directoryPath, cancellationToken: cancellationToken);
         logger.Information("FolderCompressor created archive at {OutputPath}", outputPath);
         return Task.FromResult($"Successfully created archive: {outputPath}");
     }
 
-    private async Task<string> ExecuteImageOrganizerAsync(string directoryPath)
+    private async Task<string> ExecuteImageOrganizerAsync(string directoryPath, CancellationToken cancellationToken)
     {
-        var copiedCount = await imageOrganizer.OrganizeImagesAsync(directoryPath);
+        var copiedCount = await imageOrganizer.OrganizeImagesAsync(directoryPath, cancellationToken);
         logger.Information("ImageOrganizer copied {CopiedCount} images", copiedCount);
         return $"Successfully copied {copiedCount} image(s) to Images folder.";
     }
