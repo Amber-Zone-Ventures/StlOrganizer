@@ -46,6 +46,9 @@ public partial class MainViewModel : ObservableValidator
             FileOperation.ExtractImages
         ];
         SelectedOperation = FileOperation.DecompressFiles;
+        
+        ValidateAllProperties();
+        UpdateStatusMessageFromValidation();
     }
 
     public ObservableCollection<FileOperation> AvailableOperations { get; }
@@ -62,6 +65,25 @@ public partial class MainViewModel : ObservableValidator
         var dialog = new OpenFolderDialog();
 
         if (dialog.ShowDialog() == true) SelectedDirectory = dialog.FolderName;
+    }
+
+    partial void OnSelectedDirectoryChanged(string value)
+    {
+        ValidateProperty(value, nameof(SelectedDirectory));
+        UpdateStatusMessageFromValidation();
+    }
+
+    private void UpdateStatusMessageFromValidation()
+    {
+        if (HasErrors)
+        {
+            var error = GetErrors(nameof(SelectedDirectory)).FirstOrDefault();
+            StatusMessage = error?.ErrorMessage ?? "Validation error.";
+        }
+        else if (StatusMessage == "Directory is required." || string.IsNullOrWhiteSpace(StatusMessage) || StatusMessage == "Please select a directory first.")
+        {
+            StatusMessage = "Ready";
+        }
     }
 
     [RelayCommand]
