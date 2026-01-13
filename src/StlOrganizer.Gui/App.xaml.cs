@@ -42,6 +42,7 @@ public partial class App : Application
         services.AddSingleton<IImageOrganizer, ImageOrganizer>();
         services.AddSingleton<IFolderCompressor, FolderCompressor>();
         services.AddSingleton<IOperationSelector, OperationSelector>();
+        services.AddSingleton<ICancellationTokenSourceProvider, CancellationTokenSourceProvider>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<MainWindow>();
     }
