@@ -34,15 +34,19 @@ public class FolderScannerTests
     public async Task DecompressArchives_WhenZipFilesAreFound_ShouldDecompressThem()
     {
         const string folder = @"C:\TestDir";
-        const string file = "archive.zip";
+        const string file = @"C:\TestDir\archive.zip";
+        const string destination = @"C:\TestDir\archive";
+        const string archiveName = "archive";
         A.CallTo(() => fileSystem.GetFiles(folder, "*.zip", A<SearchOption>._))
             .Returns(new List<string> { file });
+        A.CallTo(() => fileSystem.GetFileNameWithoutExtension(file)).Returns(archiveName);      
+        A.CallTo(() => fileSystem.CombinePaths(folder, archiveName)).Returns(destination);      
 
         await sut.ScanAndDecompressAsync(
             folder,
             CancellationToken.None);
 
-        A.CallTo(() => decompressor.DecompressAsync(file, folder , A<CancellationToken>._))
+        A.CallTo(() => decompressor.DecompressAsync(file, destination, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 }

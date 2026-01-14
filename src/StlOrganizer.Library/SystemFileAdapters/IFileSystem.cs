@@ -11,6 +11,4 @@ public interface IFileSystem
     string CombinePaths(params string[] paths);
     string GetFileNameWithoutExtension(string path);
     string GetExtension(string path);
-    Stream OpenRead(string path);
-    Stream CreateFile(string path);
 }

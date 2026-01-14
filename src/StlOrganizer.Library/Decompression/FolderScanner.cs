@@ -15,10 +15,12 @@ public class FolderScanner(
         
         if (files.Count == 0)
             throw new NoArchivesFoundException();
-        
+
         foreach (var file in files)
         {
-            await decompressor.DecompressAsync(file, folder, cancellationToken);
+            var fileNameWithoutExtension = fileSystem.GetFileNameWithoutExtension(file);
+            var outputPath = fileSystem.CombinePaths(folder, fileNameWithoutExtension);
+            await decompressor.DecompressAsync(file, outputPath, cancellationToken);
         }
     }
 }
