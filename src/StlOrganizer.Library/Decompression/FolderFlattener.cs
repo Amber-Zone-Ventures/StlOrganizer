@@ -4,12 +4,12 @@ namespace StlOrganizer.Library.Decompression;
 
 public class FolderFlattener(IDirectoryService directoryService) : IFolderFlattener
 {
-    public void RemoveNestedFolders(string rootPath)
+    public async Task RemoveNestedFolders(string rootPath, CancellationToken cancellationToken)
     {
         if (!directoryService.Exists(rootPath))
             throw new DirectoryNotFoundException($"Directory not found: {rootPath}");
 
-        ProcessDirectory(rootPath);
+        await Task.Run(() => ProcessDirectory(rootPath));
     }
 
     private void ProcessDirectory(string directoryPath)
