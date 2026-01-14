@@ -11,7 +11,7 @@ namespace StlOrganizer.Library.Tests.OperationSelection;
 public class ArchiveOperationSelectorTests
 {
     private readonly IDecompressionWorkflow decompressionWorkflow = A.Fake<IDecompressionWorkflow>();
-    private readonly IFolderCompressor folderCompressor = A.Fake<IFolderCompressor>();
+    private readonly ICompressor compressor = A.Fake<ICompressor>();
     private readonly IImageOrganizer imageOrganizer = A.Fake<IImageOrganizer>();
 
     [Fact]
@@ -21,10 +21,7 @@ public class ArchiveOperationSelectorTests
         const string outputPath = @"C:\test.zip";
         var logger = A.Fake<ILogger>();
 
-        A.CallTo(() => folderCompressor.CompressFolder(directoryPath, null))
-            .Returns(outputPath);
-
-        var selector = new ArchiveOperationSelector(decompressionWorkflow, folderCompressor, imageOrganizer, logger);
+        var selector = new ArchiveOperationSelector(decompressionWorkflow, compressor, imageOrganizer, logger);
 
         var result =
             await selector.ExecuteOperationAsync(
@@ -34,7 +31,7 @@ public class ArchiveOperationSelectorTests
                 CancellationToken.None);
 
         result.ShouldBe($"Successfully created archive: {outputPath}");
-        A.CallTo(() => folderCompressor.CompressFolder(directoryPath, null)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => compressor.Compress(directoryPath, outputPath, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
@@ -48,7 +45,7 @@ public class ArchiveOperationSelectorTests
         A.CallTo(() => imageOrganizer.OrganizeImagesAsync(directoryPath))
             .Returns(copiedCount);
 
-        var selector = new ArchiveOperationSelector(decompressionWorkflow, folderCompressor, imageOrganizer, logger);
+        var selector = new ArchiveOperationSelector(decompressionWorkflow, compressor, imageOrganizer, logger);
 
         var result =
             await selector.ExecuteOperationAsync(
@@ -59,28 +56,6 @@ public class ArchiveOperationSelectorTests
 
         result.ShouldBe("Successfully copied 5 image(s) to Images folder.");
         A.CallTo(() => imageOrganizer.OrganizeImagesAsync(directoryPath)).MustHaveHappenedOnceExactly();
-    }
-    
-    [Fact]
-    public async Task ExecuteOperationAsync_FolderCompressor_LogsInformation()
-    {
-        const string directoryPath = @"C:\test";
-        const string outputPath = @"C:\test.zip";
-        var logger = A.Fake<ILogger>();
-
-        A.CallTo(() => folderCompressor.CompressFolder(directoryPath, null))
-            .Returns(outputPath);
-
-        var selector = new ArchiveOperationSelector(decompressionWorkflow, folderCompressor, imageOrganizer, logger);
-
-        await selector.ExecuteOperationAsync(
-            ArchiveOperation.CompressFolder, 
-            directoryPath, 
-            new Progress<OrganizerProgress>(),
-            CancellationToken.None);
-
-        A.CallTo(() => logger.Information("FolderCompressor created archive at {OutputPath}", outputPath))
-            .MustHaveHappened();
     }
 
     [Fact]
@@ -93,7 +68,7 @@ public class ArchiveOperationSelectorTests
         A.CallTo(() => imageOrganizer.OrganizeImagesAsync(directoryPath))
             .Returns(copiedCount);
 
-        var selector = new ArchiveOperationSelector(decompressionWorkflow, folderCompressor, imageOrganizer, logger);
+        var selector = new ArchiveOperationSelector(decompressionWorkflow, compressor, imageOrganizer, logger);
 
         await selector.ExecuteOperationAsync(
             ArchiveOperation.ExtractImages, 

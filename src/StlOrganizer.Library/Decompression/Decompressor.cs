@@ -2,7 +2,7 @@
 
 namespace StlOrganizer.Library.Decompression;
 
-public class ZipFileAdapter : IDecompressor
+public class Decompressor : IDecompressor
 {
     public async Task DecompressAsync(
         string file,

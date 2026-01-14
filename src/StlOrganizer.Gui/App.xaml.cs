@@ -39,12 +39,12 @@ public partial class App
         services.AddSingleton<IFileOperations, FileOperationsAdapter>();
         services.AddSingleton<IDirectoryService, DirectoryServiceAdapter>();
         services.AddSingleton<IZipArchiveFactory, ZipArchiveFactory>();
-        services.AddSingleton<IDecompressor, ZipFileAdapter>();
+        services.AddSingleton<IDecompressor, Decompressor>();
         services.AddSingleton<IFolderScanner, FolderScanner>();
         services.AddSingleton<IFolderFlattener, FolderFlattener>();
         services.AddSingleton<IDecompressionWorkflow, DecompressionWorkflow>();
         services.AddSingleton<IImageOrganizer, ImageOrganizer>();
-        services.AddSingleton<IFolderCompressor, FolderCompressor>();
+        services.AddSingleton<ICompressor, Compressor>();
         services.AddSingleton<IArchiveOperationSelector, ArchiveOperationSelector>();
         services.AddSingleton<ICancellationTokenSourceProvider, CancellationTokenSourceProvider>();
         services.AddTransient<MainViewModel>();

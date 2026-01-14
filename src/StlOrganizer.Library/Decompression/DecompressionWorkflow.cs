@@ -15,7 +15,7 @@ public class DecompressionWorkflow(
     {
         ThrowIfDirectoryIsMissing(directoryPath);
         
-        await folderScanner.ScanAndDecompressAsync(directoryPath, cancellationToken);
+        await folderScanner.FindAndDecompress(directoryPath, progress, cancellationToken);
         
         await folderFlattener.RemoveNestedFolders(directoryPath, cancellationToken);
     }

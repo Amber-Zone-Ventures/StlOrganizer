@@ -28,19 +28,28 @@ public class DecompressionWorkflowTests
         const string path = @"C:\test";
         A.CallTo(() => fileOperations.DirectoryExists(path)).Returns(false);
         
-        await workflow.Execute(path, new Progress<OrganizerProgress>()).ShouldThrowAsync<DirectoryNotFoundException>()
+        await workflow.Execute(
+                path,
+                new Progress<OrganizerProgress>())
+            .ShouldThrowAsync<DirectoryNotFoundException>()
             .ContinueWith(t => t.Result.Message.ShouldBe($"{path}"));
     }
     
     [Fact]
     public async Task Execute_DirectoryExists_ExecutesWorkflow()
     {
+        var organizerProgress = A.Fake<IProgress<OrganizerProgress>>();
         const string path = @"C:\test";
         A.CallTo(() => fileOperations.DirectoryExists(path)).Returns(true);
         
-        await workflow.Execute(path, new Progress<OrganizerProgress>());
+        await workflow.Execute(path, organizerProgress, CancellationToken.None);
         
-        A.CallTo(() => fileDecompressor.ScanAndDecompressAsync(path, A<CancellationToken>._)).MustHaveHappened()
-            .Then(A.CallTo(() => folderFlattener.RemoveNestedFolders(path, A<CancellationToken>._)).MustHaveHappened());
+        A.CallTo(() => fileDecompressor.FindAndDecompress(
+                path,
+                organizerProgress,
+                A<CancellationToken>._)).MustHaveHappened()
+            .Then(A.CallTo(() => 
+                folderFlattener.RemoveNestedFolders(path, A<CancellationToken>._))
+                .MustHaveHappened());
     }
 }

@@ -10,6 +10,8 @@ using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
 namespace StlOrganizer.Gui.ViewModels;
 
+using System.Windows.Controls;
+
 public partial class MainViewModel : ObservableValidator
 {
     private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
@@ -113,10 +115,16 @@ public partial class MainViewModel : ObservableValidator
             IsBusy = true;
             StatusMessage = $"Executing {SelectedOperation}...";
 
+            var organizerProgress = new Progress<OrganizerProgress>(o =>
+            {
+                StatusMessage = o.Message ?? "";
+                Progress = o.Progress;
+            });
+
             var result = await archiveOperationSelector.ExecuteOperationAsync(
                     SelectedOperation,
                     SelectedDirectory,
-                    new Progress<OrganizerProgress>(),
+                    organizerProgress,
                     cancellationToken.Token);
             StatusMessage = result;
         }

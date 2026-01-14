@@ -7,7 +7,7 @@ namespace StlOrganizer.Library.OperationSelection;
 
 public class ArchiveOperationSelector(
     IDecompressionWorkflow decompressionWorkflow,
-    IFolderCompressor folderCompressor,
+    ICompressor compressor,
     IImageOrganizer imageOrganizer,
     ILogger logger) : IArchiveOperationSelector
 {
@@ -29,16 +29,19 @@ public class ArchiveOperationSelector(
     private async Task<string> ExecuteFileDecompressorAsync(string selectedPath, CancellationToken cancellationToken)
     {
         await decompressionWorkflow.Execute(selectedPath, new Progress<OrganizerProgress>(), cancellationToken);
-        var fileCount = 0;
-        logger.Information("DecompressionWorkflow extracted {fileCount} files", fileCount);
-        return $"Successfully extracted {fileCount} file(s) and flattened folders.";
+        return $"Successfully extracted file(s) and flattened folders.";
     }
 
-    private Task<string> ExecuteFolderCompressorAsync(string selectedPath, CancellationToken cancellationToken)
+    private async Task<string> ExecuteFolderCompressorAsync(string source, CancellationToken cancellationToken)
     {
-        var outputPath = folderCompressor.CompressFolder(selectedPath, cancellationToken: cancellationToken);
-        logger.Information("FolderCompressor created archive at {OutputPath}", outputPath);
-        return Task.FromResult($"Successfully created archive: {outputPath}");
+        var outputPath = source + ".zip";
+        
+        await compressor.Compress(
+            source, 
+            source + ".zip",
+            cancellationToken);
+        
+        return $"Successfully created archive: {outputPath}";
     }
 
     private async Task<string> ExecuteImageOrganizerAsync(string selectedPath, CancellationToken cancellationToken)

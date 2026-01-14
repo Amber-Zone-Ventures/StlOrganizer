@@ -1,6 +1,6 @@
 ﻿namespace StlOrganizer.Library.OperationSelection;
 
-public sealed record OrganizerProgress
+public sealed class OrganizerProgress : Progress<OrganizerProgress>
 {
     public int Progress { get; init; } = 0;
     public string? Message { get; init; } = "";

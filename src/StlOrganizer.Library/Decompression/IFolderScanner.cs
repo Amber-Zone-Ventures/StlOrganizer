@@ -1,8 +1,11 @@
 ﻿namespace StlOrganizer.Library.Decompression;
 
+using OperationSelection;
+
 public interface IFolderScanner
 {
-    Task ScanAndDecompressAsync(
+    Task FindAndDecompress(
         string folder,
+        IProgress<OrganizerProgress> progress,
         CancellationToken cancellationToken = default);
 }
