@@ -5,13 +5,14 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using StlOrganizer.Library;
 using StlOrganizer.Library.SystemAdapters;
+using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
 namespace StlOrganizer.Gui.ViewModels;
 
 public partial class MainViewModel : ObservableValidator
 {
     private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
-    private readonly IOperationSelector operationSelector;
+    private readonly IArchiveOperationSelector archiveOperationSelector;
     private CancellationTokenSource? cancellationToken;
 
     [ObservableProperty] private bool isBusy;
@@ -22,7 +23,7 @@ public partial class MainViewModel : ObservableValidator
     [Required(ErrorMessage = "Directory is required.")]
     private string selectedDirectory = string.Empty;
 
-    [ObservableProperty] private FileOperation selectedOperation;
+    [ObservableProperty] private ArchiveOperation selectedOperation;
 
     [ObservableProperty] private string statusMessage = string.Empty;
 
@@ -35,24 +36,24 @@ public partial class MainViewModel : ObservableValidator
     }
 
     public MainViewModel(
-        IOperationSelector operationSelector,
+        IArchiveOperationSelector archiveOperationSelector,
         ICancellationTokenSourceProvider cancellationTokenSourceProvider)
     {
-        this.operationSelector = operationSelector;
+        this.archiveOperationSelector = archiveOperationSelector;
         this.cancellationTokenSourceProvider = cancellationTokenSourceProvider;
         AvailableOperations =
         [
-            FileOperation.DecompressFiles,
-            FileOperation.CompressFolder,
-            FileOperation.ExtractImages
+            ArchiveOperation.DecompressArchives,
+            ArchiveOperation.CompressFolder,
+            ArchiveOperation.ExtractImages
         ];
-        SelectedOperation = FileOperation.DecompressFiles;
+        SelectedOperation = ArchiveOperation.DecompressArchives;
         
         ValidateAllProperties();
         UpdateStatusMessageFromValidation();
     }
 
-    public ObservableCollection<FileOperation> AvailableOperations { get; }
+    public ObservableCollection<ArchiveOperation> AvailableOperations { get; }
 
     [RelayCommand]
     private void ChangeTitle()
@@ -112,7 +113,7 @@ public partial class MainViewModel : ObservableValidator
             StatusMessage = $"Executing {SelectedOperation}...";
 
             var result =
-                await operationSelector.ExecuteOperationAsync(SelectedOperation, SelectedDirectory, cancellationToken.Token);
+                await archiveOperationSelector.ExecuteOperationAsync(SelectedOperation, SelectedDirectory, cancellationToken.Token);
             StatusMessage = result;
         }
         catch (OperationCanceledException)

@@ -5,21 +5,21 @@ using StlOrganizer.Library.ImageProcessing;
 
 namespace StlOrganizer.Library;
 
-public class OperationSelector(
+public class ArchiveOperationSelector(
     IDecompressionWorkflow decompressionWorkflow,
     IFolderCompressor folderCompressor,
     IImageOrganizer imageOrganizer,
-    ILogger logger) : IOperationSelector
+    ILogger logger) : IArchiveOperationSelector
 {
-    public async Task<string> ExecuteOperationAsync(FileOperation operationType,
+    public async Task<string> ExecuteOperationAsync(ArchiveOperation operationType,
         string directoryPath,
         CancellationToken cancellationToken)
     {
         return operationType switch
         {
-            _ when operationType == FileOperation.DecompressFiles => await ExecuteFileDecompressorAsync(directoryPath, cancellationToken),
-            _ when operationType == FileOperation.CompressFolder => await ExecuteFolderCompressorAsync(directoryPath, cancellationToken),
-            _ when operationType == FileOperation.ExtractImages => await ExecuteImageOrganizerAsync(directoryPath, cancellationToken),
+            _ when operationType == ArchiveOperation.DecompressArchives => await ExecuteFileDecompressorAsync(directoryPath, cancellationToken),
+            _ when operationType == ArchiveOperation.CompressFolder => await ExecuteFolderCompressorAsync(directoryPath, cancellationToken),
+            _ when operationType == ArchiveOperation.ExtractImages => await ExecuteImageOrganizerAsync(directoryPath, cancellationToken),
             _ => throw new ArgumentException($"Unknown operation type: {operationType.Name}")
         };
     }

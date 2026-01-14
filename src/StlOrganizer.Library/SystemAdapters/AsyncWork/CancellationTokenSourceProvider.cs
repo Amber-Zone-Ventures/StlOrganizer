@@ -1,4 +1,4 @@
-﻿namespace StlOrganizer.Library.SystemAdapters;
+﻿namespace StlOrganizer.Library.SystemAdapters.AsyncWork;
 
 public class CancellationTokenSourceProvider : ICancellationTokenSourceProvider
 {

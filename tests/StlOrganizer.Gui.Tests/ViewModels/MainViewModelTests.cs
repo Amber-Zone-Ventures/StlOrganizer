@@ -3,21 +3,22 @@ using Shouldly;
 using StlOrganizer.Gui.ViewModels;
 using StlOrganizer.Library;
 using StlOrganizer.Library.SystemAdapters;
+using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
 namespace StlOrganizer.Gui.Tests.ViewModels;
 
 public class MainViewModelTests
 {
     private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
-    private readonly IOperationSelector operationSelector;
+    private readonly IArchiveOperationSelector archiveOperationSelector;
     private readonly MainViewModel viewModel;
 
     public MainViewModelTests()
     {
-        operationSelector = A.Fake<IOperationSelector>();
+        archiveOperationSelector = A.Fake<IArchiveOperationSelector>();
         cancellationTokenSourceProvider = A.Fake<ICancellationTokenSourceProvider>();
         A.CallTo(() => cancellationTokenSourceProvider.Create()).ReturnsLazily(() => new CancellationTokenSource());
-        viewModel = new MainViewModel(operationSelector, cancellationTokenSourceProvider);
+        viewModel = new MainViewModel(archiveOperationSelector, cancellationTokenSourceProvider);
     }
 
     [Fact]
@@ -35,15 +36,15 @@ public class MainViewModelTests
     {
         viewModel.AvailableOperations.ShouldNotBeNull();
         viewModel.AvailableOperations.Count.ShouldBe(3);
-        viewModel.AvailableOperations.ShouldContain(FileOperation.DecompressFiles);
-        viewModel.AvailableOperations.ShouldContain(FileOperation.CompressFolder);
-        viewModel.AvailableOperations.ShouldContain(FileOperation.ExtractImages);
+        viewModel.AvailableOperations.ShouldContain(ArchiveOperation.DecompressArchives);
+        viewModel.AvailableOperations.ShouldContain(ArchiveOperation.CompressFolder);
+        viewModel.AvailableOperations.ShouldContain(ArchiveOperation.ExtractImages);
     }
 
     [Fact]
     public void Constructor_SetsDefaultSelectedOperation()
     {
-        viewModel.SelectedOperation.ShouldBe(FileOperation.DecompressFiles);
+        viewModel.SelectedOperation.ShouldBe(ArchiveOperation.DecompressArchives);
     }
 
     [Fact]
@@ -82,16 +83,16 @@ public class MainViewModelTests
         const string directory = @"C:\TestDir";
         const string expectedResult = "Operation completed successfully";
         viewModel.SelectedDirectory = directory;
-        viewModel.SelectedOperation = FileOperation.ExtractImages;
+        viewModel.SelectedOperation = ArchiveOperation.ExtractImages;
 
         A.CallTo(() =>
-                operationSelector.ExecuteOperationAsync(FileOperation.ExtractImages, directory, A<CancellationToken>._))
+                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.ExtractImages, directory, A<CancellationToken>._))
             .Returns(Task.FromResult(expectedResult));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
         A.CallTo(() =>
-                operationSelector.ExecuteOperationAsync(FileOperation.ExtractImages, directory, A<CancellationToken>._))
+                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.ExtractImages, directory, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
         viewModel.StatusMessage.ShouldBe(expectedResult);
     }
@@ -103,7 +104,7 @@ public class MainViewModelTests
         viewModel.SelectedDirectory = directory;
         var executionStarted = false;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<FileOperation>._, A<string>._, A<CancellationToken>._))
+        A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(A<ArchiveOperation>._, A<string>._, A<CancellationToken>._))
             .ReturnsLazily(() =>
             {
                 executionStarted = viewModel.IsBusy;
@@ -127,7 +128,7 @@ public class MainViewModelTests
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
 
         A.CallTo(() => cancellationTokenSourceProvider.Create()).MustHaveHappenedOnceExactly();
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<FileOperation>._, A<string>._, token))
+        A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(A<ArchiveOperation>._, A<string>._, token))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -136,9 +137,9 @@ public class MainViewModelTests
     {
         const string directory = @"C:\TestDir";
         viewModel.SelectedDirectory = directory;
-        viewModel.SelectedOperation = FileOperation.CompressFolder;
+        viewModel.SelectedOperation = ArchiveOperation.CompressFolder;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<FileOperation>._, A<string>._, A<CancellationToken>._))
+        A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(A<ArchiveOperation>._, A<string>._, A<CancellationToken>._))
             .Returns(Task.FromResult("Done"));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
@@ -153,7 +154,7 @@ public class MainViewModelTests
         const string exceptionMessage = "Test exception";
         viewModel.SelectedDirectory = directory;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<FileOperation>._, A<string>._, A<CancellationToken>._))
+        A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(A<ArchiveOperation>._, A<string>._, A<CancellationToken>._))
             .Throws(new InvalidOperationException(exceptionMessage));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
@@ -168,7 +169,7 @@ public class MainViewModelTests
         const string directory = @"C:\TestDir";
         viewModel.SelectedDirectory = directory;
 
-        A.CallTo(() => operationSelector.ExecuteOperationAsync(A<FileOperation>._, A<string>._, A<CancellationToken>._))
+        A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(A<ArchiveOperation>._, A<string>._, A<CancellationToken>._))
             .Throws(new Exception("Test error"));
 
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
@@ -179,11 +180,11 @@ public class MainViewModelTests
     [Fact]
     public void SelectedOperation_CanBeChanged()
     {
-        viewModel.SelectedOperation = FileOperation.CompressFolder;
-        viewModel.SelectedOperation.ShouldBe(FileOperation.CompressFolder);
+        viewModel.SelectedOperation = ArchiveOperation.CompressFolder;
+        viewModel.SelectedOperation.ShouldBe(ArchiveOperation.CompressFolder);
 
-        viewModel.SelectedOperation = FileOperation.ExtractImages;
-        viewModel.SelectedOperation.ShouldBe(FileOperation.ExtractImages);
+        viewModel.SelectedOperation = ArchiveOperation.ExtractImages;
+        viewModel.SelectedOperation.ShouldBe(ArchiveOperation.ExtractImages);
     }
 
     [Fact]
@@ -213,26 +214,26 @@ public class MainViewModelTests
         viewModel.SelectedDirectory = directory;
 
         // Test FileDecompressor
-        viewModel.SelectedOperation = FileOperation.DecompressFiles;
+        viewModel.SelectedOperation = ArchiveOperation.DecompressArchives;
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
         A.CallTo(() =>
-                operationSelector.ExecuteOperationAsync(FileOperation.DecompressFiles, directory,
+                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.DecompressArchives, directory,
                     A<CancellationToken>._))
             .MustHaveHappened();
 
         // Test FolderCompressor
-        viewModel.SelectedOperation = FileOperation.CompressFolder;
+        viewModel.SelectedOperation = ArchiveOperation.CompressFolder;
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
         A.CallTo(() =>
-                operationSelector.ExecuteOperationAsync(FileOperation.CompressFolder, directory,
+                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.CompressFolder, directory,
                     A<CancellationToken>._))
             .MustHaveHappened();
 
         // Test ImageOrganizer
-        viewModel.SelectedOperation = FileOperation.ExtractImages;
+        viewModel.SelectedOperation = ArchiveOperation.ExtractImages;
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
         A.CallTo(() =>
-                operationSelector.ExecuteOperationAsync(FileOperation.ExtractImages, directory, A<CancellationToken>._))
+                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.ExtractImages, directory, A<CancellationToken>._))
             .MustHaveHappened();
     }
 }

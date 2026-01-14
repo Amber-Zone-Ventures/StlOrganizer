@@ -7,7 +7,8 @@ using StlOrganizer.Library.Compression;
 using StlOrganizer.Library.Decompression;
 using StlOrganizer.Library.ImageProcessing;
 using StlOrganizer.Library.SystemAdapters;
-using StlOrganizer.Library.SystemFileAdapters;
+using StlOrganizer.Library.SystemAdapters.AsyncWork;
+using StlOrganizer.Library.SystemAdapters.FileSystem;
 
 namespace StlOrganizer.Gui;
 
@@ -43,7 +44,7 @@ public partial class App
         services.AddSingleton<IDecompressionWorkflow, DecompressionWorkflow>();
         services.AddSingleton<IImageOrganizer, ImageOrganizer>();
         services.AddSingleton<IFolderCompressor, FolderCompressor>();
-        services.AddSingleton<IOperationSelector, OperationSelector>();
+        services.AddSingleton<IArchiveOperationSelector, ArchiveOperationSelector>();
         services.AddSingleton<ICancellationTokenSourceProvider, CancellationTokenSourceProvider>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<MainWindow>();

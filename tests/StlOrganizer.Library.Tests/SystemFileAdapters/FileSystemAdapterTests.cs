@@ -1,6 +1,6 @@
 ﻿using FakeItEasy;
 using Shouldly;
-using StlOrganizer.Library.SystemFileAdapters;
+using StlOrganizer.Library.SystemAdapters.FileSystem;
 
 namespace StlOrganizer.Library.Tests.SystemFileAdapters;
 

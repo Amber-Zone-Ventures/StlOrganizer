@@ -2,7 +2,7 @@
 using Serilog;
 using Shouldly;
 using StlOrganizer.Library.ImageProcessing;
-using StlOrganizer.Library.SystemFileAdapters;
+using StlOrganizer.Library.SystemAdapters.FileSystem;
 
 namespace StlOrganizer.Library.Tests.ImageProcessing;
 

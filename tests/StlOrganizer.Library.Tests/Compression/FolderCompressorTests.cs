@@ -3,7 +3,7 @@ using FakeItEasy;
 using Serilog;
 using Shouldly;
 using StlOrganizer.Library.Compression;
-using StlOrganizer.Library.SystemFileAdapters;
+using StlOrganizer.Library.SystemAdapters.FileSystem;
 
 namespace StlOrganizer.Library.Tests.Compression;
 

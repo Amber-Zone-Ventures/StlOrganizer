@@ -1,4 +1,4 @@
-﻿namespace StlOrganizer.Library.SystemFileAdapters;
+﻿namespace StlOrganizer.Library.SystemAdapters.FileSystem;
 
 public interface IFileSystem
 {
