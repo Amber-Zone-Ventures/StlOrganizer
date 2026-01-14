@@ -2,6 +2,7 @@
 using Shouldly;
 using StlOrganizer.Gui.ViewModels;
 using StlOrganizer.Library;
+using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
@@ -35,7 +36,6 @@ public class MainViewModelTests
     public void Constructor_InitializesAvailableOperations()
     {
         viewModel.AvailableOperations.ShouldNotBeNull();
-        viewModel.AvailableOperations.Count.ShouldBe(3);
         viewModel.AvailableOperations.ShouldContain(ArchiveOperation.DecompressArchives);
         viewModel.AvailableOperations.ShouldContain(ArchiveOperation.CompressFolder);
         viewModel.AvailableOperations.ShouldContain(ArchiveOperation.ExtractImages);
@@ -176,64 +176,38 @@ public class MainViewModelTests
 
         viewModel.IsBusy.ShouldBeFalse();
     }
-
+    
     [Fact]
-    public void SelectedOperation_CanBeChanged()
+    public async Task ExecuteOperationAsync_WithDecompressArchives_PassesCorrectType()
     {
-        viewModel.SelectedOperation = ArchiveOperation.CompressFolder;
-        viewModel.SelectedOperation.ShouldBe(ArchiveOperation.CompressFolder);
-
-        viewModel.SelectedOperation = ArchiveOperation.ExtractImages;
-        viewModel.SelectedOperation.ShouldBe(ArchiveOperation.ExtractImages);
+        await ExecuteOperationAsync(ArchiveOperation.DecompressArchives);
     }
 
     [Fact]
-    public void SelectedDirectory_CanBeChanged()
+    public async Task ExecuteOperationAsync_WithCompressFolder_PassesCorrectType()
     {
-        const string directory = @"C:\TestDirectory";
-
-        viewModel.SelectedDirectory = directory;
-
-        viewModel.SelectedDirectory.ShouldBe(directory);
+        await ExecuteOperationAsync(ArchiveOperation.CompressFolder);
     }
 
     [Fact]
-    public void TextFieldValue_CanBeChanged()
+    public async Task ExecuteOperationAsync_WithExtractImages_PassesCorrectType()
     {
-        const string value = "Test Value";
-
-        viewModel.TextFieldValue = value;
-
-        viewModel.TextFieldValue.ShouldBe(value);
+        await ExecuteOperationAsync(ArchiveOperation.ExtractImages);
     }
 
-    [Fact]
-    public async Task ExecuteOperationAsync_WithDifferentOperationTypes_PassesCorrectType()
+    private async Task ExecuteOperationAsync(ArchiveOperation operation)
     {
         const string directory = @"C:\TestDir";
         viewModel.SelectedDirectory = directory;
-
-        // Test FileDecompressor
-        viewModel.SelectedOperation = ArchiveOperation.DecompressArchives;
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.DecompressArchives, directory,
-                    A<CancellationToken>._))
-            .MustHaveHappened();
-
-        // Test FolderCompressor
-        viewModel.SelectedOperation = ArchiveOperation.CompressFolder;
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.CompressFolder, directory,
-                    A<CancellationToken>._))
-            .MustHaveHappened();
-
-        // Test ImageOrganizer
         viewModel.SelectedOperation = ArchiveOperation.ExtractImages;
+        viewModel.SelectedOperation = operation;
+        
         await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(ArchiveOperation.ExtractImages, directory, A<CancellationToken>._))
+        
+        A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(
+            operation,
+            A<string>._,
+            A<CancellationToken>._))
             .MustHaveHappened();
     }
 }

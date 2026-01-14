@@ -31,4 +31,8 @@ public abstract class SmartEnum<T>(int id, string name)
     {
         return !(left == right);
     }
+    
+    public static implicit operator int(SmartEnum<T> operation) => operation.Id;
+
+    public static implicit operator string(SmartEnum<T> operation) => operation.Name;
 }

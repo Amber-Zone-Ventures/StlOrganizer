@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using StlOrganizer.Library;
+using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
@@ -112,8 +113,10 @@ public partial class MainViewModel : ObservableValidator
             IsBusy = true;
             StatusMessage = $"Executing {SelectedOperation}...";
 
-            var result =
-                await archiveOperationSelector.ExecuteOperationAsync(SelectedOperation, SelectedDirectory, cancellationToken.Token);
+            var result = await archiveOperationSelector.ExecuteOperationAsync(
+                    SelectedOperation,
+                    SelectedDirectory,
+                    cancellationToken.Token);
             StatusMessage = result;
         }
         catch (OperationCanceledException)

@@ -6,6 +6,7 @@ using StlOrganizer.Library;
 using StlOrganizer.Library.Compression;
 using StlOrganizer.Library.Decompression;
 using StlOrganizer.Library.ImageProcessing;
+using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 using StlOrganizer.Library.SystemAdapters.FileSystem;

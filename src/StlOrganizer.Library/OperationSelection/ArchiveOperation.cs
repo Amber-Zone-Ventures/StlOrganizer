@@ -1,4 +1,4 @@
-﻿namespace StlOrganizer.Library;
+﻿namespace StlOrganizer.Library.OperationSelection;
 
 public sealed class ArchiveOperation : SmartEnum<ArchiveOperation>
 {
@@ -10,7 +10,14 @@ public sealed class ArchiveOperation : SmartEnum<ArchiveOperation>
     {
     }
 
-    public static implicit operator int(ArchiveOperation operation) => operation.Id;
-
-    public static implicit operator string(ArchiveOperation operation) => operation.Name;
+    public static ArchiveOperation FromId(int operation)
+    {
+        return operation switch
+        {
+            1 => DecompressArchives,
+            2 => CompressFolder,
+            3 => ExtractImages,
+            _ => throw new ArgumentException($"Invalid operation ID: {operation}", nameof(operation))
+        };
+    }
 }

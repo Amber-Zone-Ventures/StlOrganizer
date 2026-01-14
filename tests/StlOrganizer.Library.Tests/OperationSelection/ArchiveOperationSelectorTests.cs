@@ -4,8 +4,9 @@ using Shouldly;
 using StlOrganizer.Library.Compression;
 using StlOrganizer.Library.Decompression;
 using StlOrganizer.Library.ImageProcessing;
+using StlOrganizer.Library.OperationSelection;
 
-namespace StlOrganizer.Library.Tests;
+namespace StlOrganizer.Library.Tests.OperationSelection;
 
 public class ArchiveOperationSelectorTests
 {
