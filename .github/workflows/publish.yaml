@@ -28,7 +28,7 @@ jobs:
 
       # Staging dirs inside the runner workspace
       STAGING_DIR: artifacts/staging
-      ZIP_PATH: artifacts/StlOrganizer-win-x64-${{ env.VERSION }}.zip
+      # ZIP_PATH: artifacts/StlOrganizer-win-x64-${{ env.VERSION }}.zip
 
     steps:
       - name: Checkout
@@ -96,6 +96,12 @@ jobs:
             "BUILD_NUMBER=$buildNumber" | Out-File -FilePath $env:GITHUB_ENV -Append
             "VERSION=$version"          | Out-File -FilePath $env:GITHUB_ENV -Append
           }
+          
+      - name: Set ZIP path (versioned)
+        shell: pwsh
+        run: |
+          $zipPath = "artifacts/StlOrganizer-win-x64-$env:VERSION.zip"
+          "ZIP_PATH=$zipPath" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Restore
         run: dotnet restore "${{ env.SOLUTION }}"
