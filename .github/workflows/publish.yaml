@@ -1,0 +1,93 @@
+name: Build, Test, Publish, Release (Windows Desktop)
+
+on:
+  push:
+    branches: ["main"]
+    tags:
+      - "v*"
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-test-publish:
+    runs-on: windows-latest
+
+    env:
+      CONFIGURATION: Release
+      RUNTIME: win-x64
+
+      SOLUTION: StlOrganizer/StlOrganizer.sln
+      GUI_PROJECT: StlOrganizer/src/StlOrganizer.Gui.proj
+
+      # Staging dirs inside the runner workspace
+      STAGING_DIR: artifacts/staging
+      ZIP_PATH: artifacts/StlOrganizer-win-x64.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          # Set this to the SDK your solution targets (e.g. "8.0.x" or "10.0.x")
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore "${{ env.SOLUTION }}"
+
+      - name: Build
+        run: dotnet build "${{ env.SOLUTION }}" -c ${{ env.CONFIGURATION }} --no-restore
+
+      # Runs ALL tests in the solution; the step (and job) fails if any test fails.
+      - name: Test (all)
+        run: dotnet test "${{ env.SOLUTION }}" -c ${{ env.CONFIGURATION }} --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Publish (self-contained)
+        run: >
+          dotnet publish "${{ env.GUI_PROJECT }}"
+          -c ${{ env.CONFIGURATION }}
+          -r ${{ env.RUNTIME }}
+          --self-contained true
+          -o "${{ env.STAGING_DIR }}"
+          /p:PublishSingleFile=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:DebugType=None
+          /p:DebugSymbols=false
+
+      - name: Add README to package
+        shell: pwsh
+        run: |
+          Copy-Item "StlOrganizer/README.md" "${{ env.STAGING_DIR }}/README.md" -Force
+
+      - name: Create zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path (Split-Path "${{ env.ZIP_PATH }}") | Out-Null
+          if (Test-Path "${{ env.ZIP_PATH }}") { Remove-Item "${{ env.ZIP_PATH }}" -Force }
+          Compress-Archive -Path "${{ env.STAGING_DIR }}\*" -DestinationPath "${{ env.ZIP_PATH }}"
+
+      - name: Upload packaged zip (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: StlOrganizer-${{ env.RUNTIME }}-selfcontained
+          path: ${{ env.ZIP_PATH }}
+
+      - name: Upload test results (TRX)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/*.trx"
+
+      # Create a GitHub Release + attach the zip when building a tag like v1.2.3
+      - name: Create GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_PATH }}
+          generate_release_notes: true
