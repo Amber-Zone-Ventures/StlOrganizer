@@ -87,7 +87,6 @@ public class MainViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     ArchiveOperation.ExtractImages,
                     directory,
-                    A<IProgress<OrganizerProgress>>._,
                     A<CancellationToken>._))
             .Returns(Task.FromResult(expectedResult));
 
@@ -97,7 +96,6 @@ public class MainViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     ArchiveOperation.ExtractImages,
                     directory,
-                    A<IProgress<OrganizerProgress>>._,
                     A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
         viewModel.StatusMessage.ShouldBe(expectedResult);
@@ -114,7 +112,6 @@ public class MainViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
-                    A<IProgress<OrganizerProgress>>._,
                     A<CancellationToken>._))
             .ReturnsLazily(() =>
             {
@@ -142,7 +139,6 @@ public class MainViewModelTests
         A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(
                 A<ArchiveOperation>._,
                 A<string>._,
-                A<IProgress<OrganizerProgress>>._,
                 token))
             .MustHaveHappenedOnceExactly();
     }
@@ -158,7 +154,6 @@ public class MainViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
-                    A<IProgress<OrganizerProgress>>._,
                     A<CancellationToken>._))
             .Returns(Task.FromResult("Done"));
 
@@ -178,7 +173,6 @@ public class MainViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
-                    A<IProgress<OrganizerProgress>>._,
                     A<CancellationToken>._))
             .Throws(new InvalidOperationException(exceptionMessage));
 
@@ -198,7 +192,6 @@ public class MainViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
-                    A<IProgress<OrganizerProgress>>._,
                     A<CancellationToken>._))
             .Throws(new Exception("Test error"));
 
@@ -238,7 +231,6 @@ public class MainViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
-                    A<IProgress<OrganizerProgress>>._,
                     A<CancellationToken>._))
             .MustHaveHappened();
     }

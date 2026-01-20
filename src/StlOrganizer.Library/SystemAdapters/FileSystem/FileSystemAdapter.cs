@@ -24,15 +24,9 @@ public class FileSystemAdapter(IFileOperations fileOperations) : IFileSystem
         return Path.GetFileName(path);
     }
 
-    public string? GetParentDirectory(string path) => Path.GetDirectoryName(path);
-
     public string CombinePaths(params string[] paths) => Path.Combine(paths);
 
     public string GetFileNameWithoutExtension(string path) => Path.GetFileNameWithoutExtension(path);
 
     public string GetExtension(string path) => Path.GetExtension(path);
-
-    public Stream OpenRead(string path) => File.OpenRead(path);
-
-    public Stream CreateFile(string path) => File.Create(path);
 }

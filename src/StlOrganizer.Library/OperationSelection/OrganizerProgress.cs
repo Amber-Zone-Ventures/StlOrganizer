@@ -2,6 +2,6 @@
 
 public sealed class OrganizerProgress : Progress<OrganizerProgress>
 {
-    public int Progress { get; init; } = 0;
+    public int Progress { get; init; }
     public string? Message { get; init; } = "";
 }

@@ -111,16 +111,9 @@ public partial class MainViewModel : ObservableValidator
             IsBusy = true;
             StatusMessage = $"Executing {SelectedOperation.Name}...";
 
-            var organizerProgress = new Progress<OrganizerProgress>(o =>
-            {
-                StatusMessage = o.Message ?? "";
-                Progress = o.Progress;
-            });
-
             var result = await archiveOperationSelector.ExecuteOperationAsync(
                     SelectedOperation,
                     SelectedDirectory,
-                    organizerProgress,
                     cancellationToken.Token);
             StatusMessage = result;
         }

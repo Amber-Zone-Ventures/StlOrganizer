@@ -6,9 +6,9 @@ namespace StlOrganizer.Library.ImageProcessing;
 public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperations, ILogger logger) : IImageOrganizer
 {
     private static readonly string[] ImageExtensions =
-    {
+    [
         ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".tif", ".webp", ".svg"
-    };
+    ];
 
     private const string ImagesFolderName = "Images";
 
@@ -45,18 +45,18 @@ public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperatio
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (IsImageFile(file))
+            if (IsNotImageFile(file))
+                continue;
+
+            try
             {
-                try
-                {
-                    CopyImageToFolder(file, imagesFolder);
-                    copiedCount++;
-                    logger.Debug("Copied image {FileName} to Images folder", fileOperations.GetFileName(file));
-                }
-                catch (Exception ex)
-                {
-                    logger.Error(ex, "Failed to copy image {FileName}", file);
-                }
+                CopyImageToFolder(file, imagesFolder);
+                copiedCount++;
+                logger.Debug("Copied image {FileName} to Images folder", fileOperations.GetFileName(file));
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to copy image {FileName}", file);
             }
         }
 
@@ -70,10 +70,10 @@ public class ImageOrganizer(IFileSystem fileSystem, IFileOperations fileOperatio
         return copiedCount;
     }
 
-    private bool IsImageFile(string filePath)
+    private bool IsNotImageFile(string filePath)
     {
         var extension = fileSystem.GetExtension(filePath).ToLowerInvariant();
-        return ImageExtensions.Contains(extension);
+        return !ImageExtensions.Contains(extension);
     }
 
     private void CopyImageToFolder(string sourceFile, string imagesFolder)

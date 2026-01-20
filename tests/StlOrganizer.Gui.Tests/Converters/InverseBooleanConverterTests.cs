@@ -84,7 +84,7 @@ public class InverseBooleanConverterTests
     [Fact]
     public void Convert_IsSymmetric()
     {
-        var originalValue = true;
+        const bool originalValue = true;
 
         var converted = converter.Convert(originalValue, typeof(bool), null, culture);
         var convertedBack = converter.ConvertBack(converted, typeof(bool), null, culture);

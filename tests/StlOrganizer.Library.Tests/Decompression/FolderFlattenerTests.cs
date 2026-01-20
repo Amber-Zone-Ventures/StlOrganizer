@@ -30,7 +30,7 @@ public class FolderFlattenerTests
     {
         const string path = @"C:\TestDir";
         A.CallTo(() => directoryService.Exists(path)).Returns(true);
-        A.CallTo(() => directoryService.GetDirectories(path)).Returns(Array.Empty<string>());
+        A.CallTo(() => directoryService.GetDirectories(path)).Returns([]);
 
         await flattener.RemoveNestedFolders(path, CancellationToken.None);
 
@@ -42,7 +42,7 @@ public class FolderFlattenerTests
     {
         const string path = @"C:\TestDir";
         A.CallTo(() => directoryService.Exists(path)).Returns(true);
-        A.CallTo(() => directoryService.GetDirectories(path)).Returns(Array.Empty<string>());
+        A.CallTo(() => directoryService.GetDirectories(path)).Returns([]);
 
         await flattener.RemoveNestedFolders(path, CancellationToken.None);
 
@@ -158,7 +158,7 @@ public class FolderFlattenerTests
         A.CallTo(() => directoryService.Exists(rootPath)).Returns(true);
         A.CallTo(() => directoryService.GetDirectories(rootPath)).Returns([level1Path]);
         A.CallTo(() => directoryService.GetDirectories(level1Path))
-            .ReturnsNextFromSequence([level2Path], Array.Empty<string>());
+            .ReturnsNextFromSequence([level2Path], []);
         A.CallTo(() => directoryService.GetDirectories(level2Path)).Returns([]);
         A.CallTo(() => directoryService.GetDirectoryName(rootPath)).Returns("Archive");
         A.CallTo(() => directoryService.GetDirectoryName(level1Path)).Returns("Archive");

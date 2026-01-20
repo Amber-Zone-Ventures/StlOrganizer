@@ -26,8 +26,7 @@ public class ArchiveOperationSelectorTests
         var result =
             await selector.ExecuteOperationAsync(
                 ArchiveOperation.CompressFolder, 
-                directoryPath, 
-                new Progress<OrganizerProgress>(),
+                directoryPath,
                 CancellationToken.None);
 
         result.ShouldBe($"Successfully created archive: {outputPath}");
@@ -50,8 +49,7 @@ public class ArchiveOperationSelectorTests
         var result =
             await selector.ExecuteOperationAsync(
                 ArchiveOperation.ExtractImages,
-                directoryPath,
-                new Progress<OrganizerProgress>(), 
+                directoryPath, 
                 CancellationToken.None);
 
         result.ShouldBe("Successfully copied 5 image(s) to Images folder.");
@@ -73,7 +71,6 @@ public class ArchiveOperationSelectorTests
         await selector.ExecuteOperationAsync(
             ArchiveOperation.ExtractImages, 
             directoryPath, 
-            new Progress<OrganizerProgress>(), 
             CancellationToken.None);
 
         A.CallTo(() => logger.Information("ImageOrganizer copied {CopiedCount} images", copiedCount))

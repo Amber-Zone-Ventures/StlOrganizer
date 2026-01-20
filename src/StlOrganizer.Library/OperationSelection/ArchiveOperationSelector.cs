@@ -13,8 +13,7 @@ public class ArchiveOperationSelector(
 {
     public async Task<string> ExecuteOperationAsync(
         ArchiveOperation operationType,
-        string selectedPath,
-        IProgress<OrganizerProgress> progress,  
+        string selectedPath,  
         CancellationToken cancellationToken)
     {
         return operationType switch
@@ -29,7 +28,7 @@ public class ArchiveOperationSelector(
     private async Task<string> ExecuteFileDecompressorAsync(string selectedPath, CancellationToken cancellationToken)
     {
         await decompressionWorkflow.Execute(selectedPath, new Progress<OrganizerProgress>(), cancellationToken);
-        return $"Successfully extracted file(s) and flattened folders.";
+        return "Successfully extracted file(s) and flattened folders.";
     }
 
     private async Task<string> ExecuteFolderCompressorAsync(string source, CancellationToken cancellationToken)

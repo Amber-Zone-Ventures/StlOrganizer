@@ -2,5 +2,5 @@
 
 public class CancellationTokenSourceProvider : ICancellationTokenSourceProvider
 {
-    public CancellationTokenSource Create() => new CancellationTokenSource();
+    public CancellationTokenSource Create() => new();
 }

@@ -9,7 +9,7 @@ public class FolderFlattener(IDirectoryService directoryService) : IFolderFlatte
         if (!directoryService.Exists(rootPath))
             throw new DirectoryNotFoundException($"Directory not found: {rootPath}");
 
-        await Task.Run(() => ProcessDirectory(rootPath));
+        await Task.Run(() => ProcessDirectory(rootPath), cancellationToken);
     }
 
     private void ProcessDirectory(string directoryPath)
@@ -28,10 +28,10 @@ public class FolderFlattener(IDirectoryService directoryService) : IFolderFlatte
         var parentName = directoryService.GetDirectoryName(parentPath);
         var childName = directoryService.GetDirectoryName(childPath);
 
-        if (string.Equals(parentName, childName, StringComparison.OrdinalIgnoreCase))
-        {
-            directoryService.Move(childPath, parentPath);
-            directoryService.Delete(childPath, recursive: false);
-        }
+        if (!string.Equals(parentName, childName, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        directoryService.Move(childPath, parentPath);
+        directoryService.Delete(childPath, recursive: false);
     }
 }

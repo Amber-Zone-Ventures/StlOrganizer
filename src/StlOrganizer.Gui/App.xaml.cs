@@ -25,7 +25,7 @@ public partial class App
         serviceProvider = services.BuildServiceProvider();
     }
 
-    private void ConfigureServices(ServiceCollection services)
+    private static void ConfigureServices(ServiceCollection services)
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()

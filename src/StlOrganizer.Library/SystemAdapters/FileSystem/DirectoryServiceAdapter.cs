@@ -6,8 +6,6 @@ public class DirectoryServiceAdapter : IDirectoryService
 
     public string[] GetDirectories(string path) => Directory.GetDirectories(path);
 
-    public string[] GetFiles(string path) => Directory.GetFiles(path);
-
     public void Move(string sourcePath, string destinationPath)
     {
         foreach (var file in Directory.GetFiles(sourcePath))
