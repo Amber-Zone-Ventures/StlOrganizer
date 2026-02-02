@@ -26,8 +26,4 @@
       <ProjectReference Include="..\..\src\StlOrganizer.Library\StlOrganizer.Library.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Compression\" />
-    </ItemGroup>
-
 </Project>
