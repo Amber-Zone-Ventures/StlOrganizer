@@ -1,23 +1,23 @@
 ﻿using FakeItEasy;
 using Shouldly;
-using StlOrganizer.Gui.ViewModels;
+using StlOrganizer.Gui.Compression;
 using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
-namespace StlOrganizer.Gui.Tests.ViewModels;
+namespace StlOrganizer.Gui.Tests.Compression;
 
-public class MainViewModelTests
+public class CompressionViewModelTests
 {
-    private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
     private readonly IArchiveOperationSelector archiveOperationSelector;
-    private readonly MainViewModel viewModel;
+    private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
+    private readonly CompressionViewModel viewModel;
 
-    public MainViewModelTests()
+    public CompressionViewModelTests()
     {
         archiveOperationSelector = A.Fake<IArchiveOperationSelector>();
         cancellationTokenSourceProvider = A.Fake<ICancellationTokenSourceProvider>();
         A.CallTo(() => cancellationTokenSourceProvider.Create()).ReturnsLazily(() => new CancellationTokenSource());
-        viewModel = new MainViewModel(archiveOperationSelector, cancellationTokenSourceProvider);
+        viewModel = new CompressionViewModel(archiveOperationSelector, cancellationTokenSourceProvider);
     }
 
     [Fact]

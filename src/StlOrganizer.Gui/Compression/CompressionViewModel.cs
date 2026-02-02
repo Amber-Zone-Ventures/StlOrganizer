@@ -6,20 +6,27 @@ using Microsoft.Win32;
 using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
-namespace StlOrganizer.Gui.ViewModels;
+namespace StlOrganizer.Gui.Compression;
 
-public partial class MainViewModel : ObservableValidator
+public partial class CompressionViewModel : ObservableValidator
 {
-    private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
     private readonly IArchiveOperationSelector archiveOperationSelector;
+    private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
+
+    [ObservableProperty] private ObservableCollection<object> availableOperations =
+    [
+        ArchiveOperation.DecompressArchives,
+        ArchiveOperation.CompressFolder,
+        ArchiveOperation.ExtractImages
+    ];
+
     private CancellationTokenSource? cancellationToken;
 
     [ObservableProperty] private bool isBusy;
 
     [ObservableProperty] private int progress;
 
-    [ObservableProperty]
-    [Required(ErrorMessage = "Directory is required.")]
+    [ObservableProperty] [Required(ErrorMessage = "Directory is required.")]
     private string selectedDirectory = string.Empty;
 
     [ObservableProperty] private ArchiveOperation selectedOperation;
@@ -30,29 +37,17 @@ public partial class MainViewModel : ObservableValidator
 
     [ObservableProperty] private string title = "Stl Organizer";
 
-    public MainViewModel() : this(null!, null!)
-    {
-    }
-
-    public MainViewModel(
+    public CompressionViewModel(
         IArchiveOperationSelector archiveOperationSelector,
         ICancellationTokenSourceProvider cancellationTokenSourceProvider)
     {
         this.archiveOperationSelector = archiveOperationSelector;
         this.cancellationTokenSourceProvider = cancellationTokenSourceProvider;
-        AvailableOperations =
-        [
-            ArchiveOperation.DecompressArchives,
-            ArchiveOperation.CompressFolder,
-            ArchiveOperation.ExtractImages
-        ];
         SelectedOperation = ArchiveOperation.DecompressArchives;
-        
+
         ValidateAllProperties();
         UpdateStatusMessageFromValidation();
     }
-
-    public ObservableCollection<ArchiveOperation> AvailableOperations { get; }
 
     [RelayCommand]
     private void ChangeTitle()
@@ -81,7 +76,8 @@ public partial class MainViewModel : ObservableValidator
             var error = GetErrors(nameof(SelectedDirectory)).FirstOrDefault();
             StatusMessage = error?.ErrorMessage ?? "Validation error.";
         }
-        else if (StatusMessage == "Directory is required." || string.IsNullOrWhiteSpace(StatusMessage) || StatusMessage == "Please select a directory first.")
+        else if (StatusMessage == "Directory is required." || string.IsNullOrWhiteSpace(StatusMessage) ||
+                 StatusMessage == "Please select a directory first.")
         {
             StatusMessage = "Ready";
         }
@@ -100,9 +96,7 @@ public partial class MainViewModel : ObservableValidator
         UpdateStatusMessageFromValidation();
 
         if (HasErrors)
-        {
             return;
-        }
 
         cancellationToken = cancellationTokenSourceProvider.Create();
 
@@ -112,9 +106,9 @@ public partial class MainViewModel : ObservableValidator
             StatusMessage = $"Executing {SelectedOperation.Name}...";
 
             var result = await archiveOperationSelector.ExecuteOperationAsync(
-                    SelectedOperation,
-                    SelectedDirectory,
-                    cancellationToken.Token);
+                SelectedOperation,
+                SelectedDirectory,
+                cancellationToken.Token);
             StatusMessage = result;
         }
         catch (OperationCanceledException)
