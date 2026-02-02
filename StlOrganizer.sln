@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280 d18.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StlOrganizer.Gui", "src\StlOrganizer.Gui\StlOrganizer.Gui.csproj", "{C5699AD4-FE95-43B3-9652-2B6AA7797E29}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StlOrganizer.Library", "src\StlOrganizer.Library\StlOrganizer.Library.csproj", "{49B1522C-0D2B-44F1-9076-1A78822B44A5}"
@@ -34,6 +37,9 @@ Global
 		{EC47FB26-BA28-4F06-8E0E-DF67BBB57CC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC47FB26-BA28-4F06-8E0E-DF67BBB57CC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC47FB26-BA28-4F06-8E0E-DF67BBB57CC1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5699AD4-FE95-43B3-9652-2B6AA7797E29} = {7EAA0445-738A-4863-AADE-761F9948E249}
