@@ -9,18 +9,81 @@
                  mc:Ignorable="d"
                  Background="{DynamicResource SystemControlPageBackgroundAltHighBrush}"
                  Foreground="{DynamicResource SystemControlPageTextBaseHighBrush}"
-                 Height="380" Width="856"
+                 Height="365" Width="856"
                  WindowStartupLocation="CenterScreen">
     <Grid>
-        <StackPanel>
-            <ui:TitleBar Title="STL Organizer" />
-            <ui:NavigationView x:Name="NavigationView"
-                               PaneDisplayMode="LeftMinimal"
-                               IsBackButtonVisible="Collapsed"
-                               AlwaysShowHeader="True"
-                               IsPaneOpen="False"
-                               MenuItemsSource="{Binding MenuItems, Mode=OneWay}" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70*" />
+            <ColumnDefinition Width="30*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="120" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0"
+                     Grid.ColumnSpan="2"
+                     Title="STL Organizer" />
+        
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10">
+            <Button Content="Select Directory"
+                    Command="{Binding SelectDirectoryCommand}"
+                    Padding="10,5" />
+            <TextBox Text="{Binding SelectedDirectory, Mode=OneWay}"
+                     IsReadOnly="True"
+                     MinWidth="300"
+                     Margin="10,0,0,0"
+                     VerticalContentAlignment="Center" />
         </StackPanel>
 
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="Select what you want to do:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0" />
+            <ComboBox
+                ItemsSource="{Binding AvailableOperations}"
+                SelectedItem="{Binding SelectedOperation}"
+                SelectedValuePath="Id"
+                DisplayMemberPath="Name"
+                MinWidth="200" />
+        </StackPanel>
+
+        <ProgressBar Grid.Row="3"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     Margin="10,5"
+                     VerticalAlignment="Center"
+                     Minimum="0"
+                     Maximum="100"
+                     Value="{Binding Progress}"
+                     Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <TextBlock Grid.Row="4"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Text="{Binding StatusMessage}"
+                   Margin="10"
+                   FontWeight="Bold" />
+
+        <Button Grid.Row="5"
+                Grid.Column="1"
+                Content="{Binding SelectedOperation.Name}"
+                Command="{Binding ExecuteOperationCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
+                Margin="10"
+                Padding="10,5"
+                HorizontalAlignment="Right" />
+
+        <Button Grid.Row="5"
+                Grid.Column="0"
+                Content="Cancel"
+                Command="{Binding CancelCommand}"
+                IsEnabled="{Binding IsBusy}"
+                Margin="10"
+                Padding="10,5" />
     </Grid>
 </ui:FluentWindow>

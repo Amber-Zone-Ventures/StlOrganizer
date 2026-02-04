@@ -1,6 +1,7 @@
 ﻿using FakeItEasy;
 using Shouldly;
 using StlOrganizer.Gui.Compression;
+using StlOrganizer.Library.Compression;
 using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
@@ -87,6 +88,7 @@ public class CompressionViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     ArchiveOperation.ExtractImages,
                     directory,
+                    A<IProgress<CompressProgress>>._,
                     A<CancellationToken>._))
             .Returns(Task.FromResult(expectedResult));
 
@@ -96,6 +98,7 @@ public class CompressionViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     ArchiveOperation.ExtractImages,
                     directory,
+                    A<IProgress<CompressProgress>>._,
                     A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
         viewModel.StatusMessage.ShouldBe(expectedResult);
@@ -112,6 +115,7 @@ public class CompressionViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
+                    A<IProgress<CompressProgress>>._,
                     A<CancellationToken>._))
             .ReturnsLazily(() =>
             {
@@ -139,6 +143,7 @@ public class CompressionViewModelTests
         A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(
                 A<ArchiveOperation>._,
                 A<string>._,
+                A<IProgress<CompressProgress>>._,
                 token))
             .MustHaveHappenedOnceExactly();
     }
@@ -154,6 +159,7 @@ public class CompressionViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
+                    A<IProgress<CompressProgress>>._,
                     A<CancellationToken>._))
             .Returns(Task.FromResult("Done"));
 
@@ -173,6 +179,7 @@ public class CompressionViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
+                    A<IProgress<CompressProgress>>._,
                     A<CancellationToken>._))
             .Throws(new InvalidOperationException(exceptionMessage));
 
@@ -192,6 +199,7 @@ public class CompressionViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
+                    A<IProgress<CompressProgress>>._,
                     A<CancellationToken>._))
             .Throws(new Exception("Test error"));
 
@@ -231,6 +239,7 @@ public class CompressionViewModelTests
                 archiveOperationSelector.ExecuteOperationAsync(
                     A<ArchiveOperation>._,
                     A<string>._,
+                    A<IProgress<CompressProgress>>._,
                     A<CancellationToken>._))
             .MustHaveHappened();
     }

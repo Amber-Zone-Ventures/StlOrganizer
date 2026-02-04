@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using StlOrganizer.Library.Compression;
 using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
@@ -108,6 +109,11 @@ public partial class CompressionViewModel : ObservableValidator
             var result = await archiveOperationSelector.ExecuteOperationAsync(
                 SelectedOperation,
                 SelectedDirectory,
+                new Progress<CompressProgress>(o =>
+                {
+                    Progress = o.Percent;
+                    StatusMessage = $"Processing file: {o.LastFile}.";
+                }),
                 cancellationToken.Token);
             StatusMessage = result;
         }

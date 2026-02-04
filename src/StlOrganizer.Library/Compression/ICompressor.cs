@@ -5,5 +5,6 @@ public interface ICompressor
     Task Compress(
         string source,
         string destination,
-        CancellationToken cancellationToken);
+        IProgress<CompressProgress> progress,
+        CancellationToken cancellationToken = default);
 }

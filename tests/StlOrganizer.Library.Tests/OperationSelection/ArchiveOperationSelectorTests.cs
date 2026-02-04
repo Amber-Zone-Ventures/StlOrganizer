@@ -27,10 +27,11 @@ public class ArchiveOperationSelectorTests
             await selector.ExecuteOperationAsync(
                 ArchiveOperation.CompressFolder, 
                 directoryPath,
+                new Progress<CompressProgress>(), 
                 CancellationToken.None);
 
         result.ShouldBe($"Successfully created archive: {outputPath}");
-        A.CallTo(() => compressor.Compress(directoryPath, outputPath, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => compressor.Compress(directoryPath, outputPath, A<Progress<CompressProgress>>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
@@ -49,8 +50,8 @@ public class ArchiveOperationSelectorTests
         var result =
             await selector.ExecuteOperationAsync(
                 ArchiveOperation.ExtractImages,
-                directoryPath, 
-                CancellationToken.None);
+                directoryPath,
+                cancellationToken: CancellationToken.None);
 
         result.ShouldBe("Successfully copied 5 image(s) to Images folder.");
         A.CallTo(() => imageOrganizer.OrganizeImagesAsync(directoryPath)).MustHaveHappenedOnceExactly();
@@ -71,7 +72,7 @@ public class ArchiveOperationSelectorTests
         await selector.ExecuteOperationAsync(
             ArchiveOperation.ExtractImages, 
             directoryPath, 
-            CancellationToken.None);
+            cancellationToken: CancellationToken.None);
 
         A.CallTo(() => logger.Information("ImageOrganizer copied {CopiedCount} images", copiedCount))
             .MustHaveHappened();

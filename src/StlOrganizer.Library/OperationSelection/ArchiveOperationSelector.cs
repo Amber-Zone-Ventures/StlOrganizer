@@ -13,31 +13,36 @@ public class ArchiveOperationSelector(
 {
     public async Task<string> ExecuteOperationAsync(
         ArchiveOperation operationType,
-        string selectedPath,  
-        CancellationToken cancellationToken)
+        string selectedPath,
+        IProgress<CompressProgress> progress = null,
+        CancellationToken cancellationToken = default)
     {
         return operationType switch
         {
-            _ when operationType == ArchiveOperation.DecompressArchives => await ExecuteFileDecompressorAsync(selectedPath, cancellationToken),
-            _ when operationType == ArchiveOperation.CompressFolder => await ExecuteFolderCompressorAsync(selectedPath, cancellationToken),
+            _ when operationType == ArchiveOperation.DecompressArchives => await ExecuteFileDecompressorAsync(selectedPath, progress, cancellationToken),
+            _ when operationType == ArchiveOperation.CompressFolder => await ExecuteFolderCompressorAsync(selectedPath, progress, cancellationToken),
             _ when operationType == ArchiveOperation.ExtractImages => await ExecuteImageOrganizerAsync(selectedPath, cancellationToken),
             _ => throw new ArgumentException($"Unknown operation type: {operationType.Name}")
         };
     }
 
-    private async Task<string> ExecuteFileDecompressorAsync(string selectedPath, CancellationToken cancellationToken)
+    private async Task<string> ExecuteFileDecompressorAsync(string selectedPath, IProgress<CompressProgress> progress, CancellationToken cancellationToken)
     {
         await decompressionWorkflow.Execute(selectedPath, new Progress<OrganizerProgress>(), cancellationToken);
         return "Successfully extracted file(s) and flattened folders.";
     }
 
-    private async Task<string> ExecuteFolderCompressorAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> ExecuteFolderCompressorAsync(
+        string source,
+        IProgress<CompressProgress> progress,
+        CancellationToken cancellationToken)
     {
         var outputPath = source + ".zip";
         
         await compressor.Compress(
             source, 
             source + ".zip",
+            progress,
             cancellationToken);
         
         return $"Successfully created archive: {outputPath}";
