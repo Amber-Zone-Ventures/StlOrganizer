@@ -1,4 +1,3 @@
-using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.FileSystem;
 
 namespace StlOrganizer.Library.Decompression;
@@ -10,7 +9,7 @@ public class DecompressionWorkflow(
 {
     public async Task Execute(
         string directoryPath,
-        IProgress<OrganizerProgress> progress,
+        IProgress<DecompressionProgress> progress,
         CancellationToken cancellationToken = default)
     {
         ThrowIfDirectoryIsMissing(directoryPath);

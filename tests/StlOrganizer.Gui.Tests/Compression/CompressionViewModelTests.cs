@@ -1,24 +1,20 @@
 ﻿using FakeItEasy;
 using Shouldly;
 using StlOrganizer.Gui.Compression;
-using StlOrganizer.Library.Compression;
-using StlOrganizer.Library.OperationSelection;
+using StlOrganizer.Gui.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
 namespace StlOrganizer.Gui.Tests.Compression;
 
 public class CompressionViewModelTests
 {
-    private readonly IArchiveOperationSelector archiveOperationSelector;
-    private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
     private readonly CompressionViewModel viewModel;
 
     public CompressionViewModelTests()
     {
-        archiveOperationSelector = A.Fake<IArchiveOperationSelector>();
-        cancellationTokenSourceProvider = A.Fake<ICancellationTokenSourceProvider>();
-        A.CallTo(() => cancellationTokenSourceProvider.Create()).ReturnsLazily(() => new CancellationTokenSource());
-        viewModel = new CompressionViewModel(archiveOperationSelector, cancellationTokenSourceProvider);
+        var cancellationTokenSourceProvider1 = A.Fake<ICancellationTokenSourceProvider>();
+        A.CallTo(() => cancellationTokenSourceProvider1.Create()).ReturnsLazily(() => new CancellationTokenSource());
+        viewModel = new CompressionViewModel(cancellationTokenSourceProvider1);
     }
 
     [Fact]
@@ -74,173 +70,5 @@ public class CompressionViewModelTests
 
         viewModel.StatusMessage.ShouldBe("Directory is required.");
         viewModel.IsBusy.ShouldBeFalse();
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_WithValidDirectory_CallsOperationSelector()
-    {
-        const string directory = @"C:\TestDir";
-        const string expectedResult = "Operation completed successfully";
-        viewModel.SelectedDirectory = directory;
-        viewModel.SelectedOperation = ArchiveOperation.ExtractImages;
-
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(
-                    ArchiveOperation.ExtractImages,
-                    directory,
-                    A<IProgress<CompressProgress>>._,
-                    A<CancellationToken>._))
-            .Returns(Task.FromResult(expectedResult));
-
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(
-                    ArchiveOperation.ExtractImages,
-                    directory,
-                    A<IProgress<CompressProgress>>._,
-                    A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-        viewModel.StatusMessage.ShouldBe(expectedResult);
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_SetsIsExecutingDuringOperation()
-    {
-        const string directory = @"C:\TestDir";
-        viewModel.SelectedDirectory = directory;
-        var executionStarted = false;
-
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(
-                    A<ArchiveOperation>._,
-                    A<string>._,
-                    A<IProgress<CompressProgress>>._,
-                    A<CancellationToken>._))
-            .ReturnsLazily(() =>
-            {
-                executionStarted = viewModel.IsBusy;
-                return Task.FromResult("Success");
-            });
-
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-
-        executionStarted.ShouldBeTrue();
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_UsesCancellationTokenSourceFromProvider()
-    {
-        const string directory = @"C:\TestDir";
-        viewModel.SelectedDirectory = directory;
-        var cts = new CancellationTokenSource();
-        var token = cts.Token;
-        A.CallTo(() => cancellationTokenSourceProvider.Create()).Returns(cts);
-
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-
-        A.CallTo(() => cancellationTokenSourceProvider.Create()).MustHaveHappenedOnceExactly();
-        A.CallTo(() => archiveOperationSelector.ExecuteOperationAsync(
-                A<ArchiveOperation>._,
-                A<string>._,
-                A<IProgress<CompressProgress>>._,
-                token))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_SetsStatusMessageDuringOperation()
-    {
-        const string directory = @"C:\TestDir";
-        viewModel.SelectedDirectory = directory;
-        viewModel.SelectedOperation = ArchiveOperation.CompressFolder;
-
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(
-                    A<ArchiveOperation>._,
-                    A<string>._,
-                    A<IProgress<CompressProgress>>._,
-                    A<CancellationToken>._))
-            .Returns(Task.FromResult("Done"));
-
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-
-        viewModel.StatusMessage.ShouldBe("Done");
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_WithException_SetsErrorMessage()
-    {
-        const string directory = @"C:\TestDir";
-        const string exceptionMessage = "Test exception";
-        viewModel.SelectedDirectory = directory;
-
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(
-                    A<ArchiveOperation>._,
-                    A<string>._,
-                    A<IProgress<CompressProgress>>._,
-                    A<CancellationToken>._))
-            .Throws(new InvalidOperationException(exceptionMessage));
-
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-
-        viewModel.StatusMessage.ShouldBe($"Error: {exceptionMessage}");
-        viewModel.IsBusy.ShouldBeFalse();
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_WithException_ResetsIsExecuting()
-    {
-        const string directory = @"C:\TestDir";
-        viewModel.SelectedDirectory = directory;
-
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(
-                    A<ArchiveOperation>._,
-                    A<string>._,
-                    A<IProgress<CompressProgress>>._,
-                    A<CancellationToken>._))
-            .Throws(new Exception("Test error"));
-
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-
-        viewModel.IsBusy.ShouldBeFalse();
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_WithDecompressArchives_PassesCorrectType()
-    {
-        await ExecuteOperationAsync(ArchiveOperation.DecompressArchives);
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_WithCompressFolder_PassesCorrectType()
-    {
-        await ExecuteOperationAsync(ArchiveOperation.CompressFolder);
-    }
-
-    [Fact]
-    public async Task ExecuteOperationAsync_WithExtractImages_PassesCorrectType()
-    {
-        await ExecuteOperationAsync(ArchiveOperation.ExtractImages);
-    }
-
-    private async Task ExecuteOperationAsync(ArchiveOperation operation)
-    {
-        const string directory = @"C:\TestDir";
-        viewModel.SelectedDirectory = directory;
-        viewModel.SelectedOperation = ArchiveOperation.ExtractImages;
-        viewModel.SelectedOperation = operation;
-
-        await viewModel.ExecuteOperationCommand.ExecuteAsync(null);
-
-        A.CallTo(() =>
-                archiveOperationSelector.ExecuteOperationAsync(
-                    A<ArchiveOperation>._,
-                    A<string>._,
-                    A<IProgress<CompressProgress>>._,
-                    A<CancellationToken>._))
-            .MustHaveHappened();
     }
 }

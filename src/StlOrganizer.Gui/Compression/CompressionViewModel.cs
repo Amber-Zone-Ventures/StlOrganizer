@@ -3,15 +3,13 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
-using StlOrganizer.Library.Compression;
-using StlOrganizer.Library.OperationSelection;
+using StlOrganizer.Gui.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
 namespace StlOrganizer.Gui.Compression;
 
 public partial class CompressionViewModel : ObservableValidator
 {
-    private readonly IArchiveOperationSelector archiveOperationSelector;
     private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
 
     [ObservableProperty] private ObservableCollection<object> availableOperations =
@@ -39,10 +37,8 @@ public partial class CompressionViewModel : ObservableValidator
     [ObservableProperty] private string title = "Stl Organizer";
 
     public CompressionViewModel(
-        IArchiveOperationSelector archiveOperationSelector,
         ICancellationTokenSourceProvider cancellationTokenSourceProvider)
     {
-        this.archiveOperationSelector = archiveOperationSelector;
         this.cancellationTokenSourceProvider = cancellationTokenSourceProvider;
         SelectedOperation = ArchiveOperation.DecompressArchives;
 
@@ -91,31 +87,18 @@ public partial class CompressionViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private async Task ExecuteOperationAsync()
+    private Task ExecuteOperationAsync()
     {
         ValidateAllProperties();
         UpdateStatusMessageFromValidation();
 
         if (HasErrors)
-            return;
+            return Task.CompletedTask;
 
         cancellationToken = cancellationTokenSourceProvider.Create();
 
         try
         {
-            IsBusy = true;
-            StatusMessage = $"Executing {SelectedOperation.Name}...";
-
-            var result = await archiveOperationSelector.ExecuteOperationAsync(
-                SelectedOperation,
-                SelectedDirectory,
-                new Progress<CompressProgress>(o =>
-                {
-                    Progress = o.Percent;
-                    StatusMessage = $"Processing file: {o.LastFile}.";
-                }),
-                cancellationToken.Token);
-            StatusMessage = result;
         }
         catch (OperationCanceledException)
         {
@@ -131,5 +114,6 @@ public partial class CompressionViewModel : ObservableValidator
             cancellationToken.Dispose();
             cancellationToken = null;
         }
+        return Task.CompletedTask;
     }
 }

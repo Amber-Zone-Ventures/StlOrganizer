@@ -3,16 +3,20 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using StlOrganizer.Gui.OperationSelection;
 using StlOrganizer.Library.Compression;
-using StlOrganizer.Library.OperationSelection;
+using StlOrganizer.Library.Decompression;
+using StlOrganizer.Library.ImageProcessing;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 
 namespace StlOrganizer.Gui;
 
 public partial class MainWindowViewModel : ObservableValidator
 {
-    private readonly IArchiveOperationSelector archiveOperationSelector;
     private readonly ICancellationTokenSourceProvider cancellationTokenSourceProvider;
+    private readonly ICompressor compressor;
+    private readonly IDecompressionWorkflow decompressionWorkflow;
+    private readonly IImageOrganizer imageOrganizer;
 
     [ObservableProperty] private ObservableCollection<object> availableOperations =
     [
@@ -39,16 +43,27 @@ public partial class MainWindowViewModel : ObservableValidator
     [ObservableProperty] private string title = "Stl Organizer";
 
     public MainWindowViewModel(
-        IArchiveOperationSelector archiveOperationSelector,
+        IDecompressionWorkflow decompressionWorkflow,
+        ICompressor compressor,
+        IImageOrganizer imageOrganizer,
         ICancellationTokenSourceProvider cancellationTokenSourceProvider)
     {
-        this.archiveOperationSelector = archiveOperationSelector;
+        this.decompressionWorkflow = decompressionWorkflow;
+        this.compressor = compressor;
+        this.imageOrganizer = imageOrganizer;
         this.cancellationTokenSourceProvider = cancellationTokenSourceProvider;
         SelectedOperation = ArchiveOperation.DecompressArchives;
 
         ValidateAllProperties();
         UpdateStatusMessageFromValidation();
     }
+
+    public Dictionary<ArchiveOperation, Func<Task>> OperationMap => new()
+    {
+        { ArchiveOperation.CompressFolder, CompressFolder },
+        { ArchiveOperation.DecompressArchives, DecompressFolder },
+        { ArchiveOperation.ExtractImages, ExtractImages }
+    };
 
     [RelayCommand]
     private void ChangeTitle()
@@ -106,16 +121,10 @@ public partial class MainWindowViewModel : ObservableValidator
             IsBusy = true;
             StatusMessage = $"Executing {SelectedOperation.Name}...";
 
-            var result = await archiveOperationSelector.ExecuteOperationAsync(
-                SelectedOperation,
-                SelectedDirectory,
-                new Progress<CompressProgress>(o =>
-                {
-                    Progress = o.Percent;
-                    StatusMessage = $"Processing file: {o.LastFile}.";
-                }),
-                cancellationToken.Token);
-            StatusMessage = result;
+            await OperationMap.First(o => SelectedOperation == o.Key)
+                .Value();
+
+            StatusMessage = "Operation completed successfully.";
         }
         catch (OperationCanceledException)
         {
@@ -131,5 +140,37 @@ public partial class MainWindowViewModel : ObservableValidator
             cancellationToken.Dispose();
             cancellationToken = null;
         }
+    }
+
+    private async Task ExtractImages()
+    {
+        await imageOrganizer.OrganizeImagesAsync(
+            SelectedDirectory,
+            cancellationToken!.Token);
+    }
+
+    private async Task DecompressFolder()
+    {
+        await decompressionWorkflow.Execute(
+            SelectedDirectory,
+            new Progress<DecompressionProgress>(o =>
+            {
+                Progress = o.Progress;
+                StatusMessage = $"Decompressing {o.Message}";
+            }),
+            cancellationToken!.Token);
+    }
+
+    private async Task CompressFolder()
+    {
+        await compressor.Compress(
+            SelectedDirectory,
+            SelectedDirectory + ".zip",
+            new Progress<CompressProgress>(o =>
+            {
+                Progress = o.Percent;
+                StatusMessage = $"Compressing {o.LastFile}";
+            }),
+            cancellationToken!.Token);
     }
 }

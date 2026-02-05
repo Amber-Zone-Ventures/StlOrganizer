@@ -1,11 +1,16 @@
-﻿namespace StlOrganizer.Library.SystemAdapters.FileSystem;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace StlOrganizer.Library.SystemAdapters.FileSystem;
 
 public class DirectoryServiceAdapter : IDirectoryService
 {
+    [ExcludeFromCodeCoverage]
     public bool Exists(string path) => Directory.Exists(path);
 
+    [ExcludeFromCodeCoverage]
     public string[] GetDirectories(string path) => Directory.GetDirectories(path);
 
+    [ExcludeFromCodeCoverage]
     public void Move(string sourcePath, string destinationPath)
     {
         foreach (var file in Directory.GetFiles(sourcePath))
@@ -23,6 +28,7 @@ public class DirectoryServiceAdapter : IDirectoryService
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public void Delete(string path, bool recursive) => Directory.Delete(path, recursive);
 
     public string GetDirectoryName(string path) => Path.GetFileName(path);

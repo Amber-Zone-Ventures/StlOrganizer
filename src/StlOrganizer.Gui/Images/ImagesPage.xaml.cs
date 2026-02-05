@@ -1,12 +1,9 @@
-﻿using System.Windows.Controls;
+﻿namespace StlOrganizer.Gui.Images;
 
-namespace StlOrganizer.Gui.Images;
-
-public partial class ImagesPage : Page
+public partial class ImagesPage
 {
     public ImagesPage()
     {
         InitializeComponent();
     }
 }
-

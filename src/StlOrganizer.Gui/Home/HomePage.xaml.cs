@@ -1,12 +1,9 @@
-﻿using System.Windows.Controls;
+﻿namespace StlOrganizer.Gui.Home;
 
-namespace StlOrganizer.Gui.Home;
-
-public partial class HomePage : Page
+public partial class HomePage
 {
     public HomePage()
     {
         InitializeComponent();
     }
 }
-

@@ -1,7 +1,6 @@
 using FakeItEasy;
 using Shouldly;
 using StlOrganizer.Library.Decompression;
-using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.FileSystem;
 
 namespace StlOrganizer.Library.Tests.Decompression;
@@ -29,7 +28,7 @@ public class DecompressionWorkflowTests
         
         await workflow.Execute(
                 path,
-                new Progress<OrganizerProgress>())
+                new Progress<DecompressionProgress>())
             .ShouldThrowAsync<DirectoryNotFoundException>()
             .ContinueWith(t => t.Result.Message.ShouldBe($"{path}"));
     }
@@ -37,7 +36,7 @@ public class DecompressionWorkflowTests
     [Fact]
     public async Task Execute_DirectoryExists_ExecutesWorkflow()
     {
-        var organizerProgress = A.Fake<IProgress<OrganizerProgress>>();
+        var organizerProgress = A.Fake<IProgress<DecompressionProgress>>();
         const string path = @"C:\test";
         A.CallTo(() => fileOperations.DirectoryExists(path)).Returns(true);
         

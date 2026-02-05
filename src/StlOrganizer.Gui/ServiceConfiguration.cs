@@ -6,7 +6,6 @@ using StlOrganizer.Gui.Images;
 using StlOrganizer.Library.Compression;
 using StlOrganizer.Library.Decompression;
 using StlOrganizer.Library.ImageProcessing;
-using StlOrganizer.Library.OperationSelection;
 using StlOrganizer.Library.SystemAdapters.AsyncWork;
 using StlOrganizer.Library.SystemAdapters.FileSystem;
 
@@ -29,9 +28,10 @@ public static class ServiceConfiguration
         services.AddSingleton<IFolderScanner, FolderScanner>();
         services.AddSingleton<IFolderFlattener, FolderFlattener>();
         services.AddSingleton<IDecompressionWorkflow, DecompressionWorkflow>();
+        services.AddSingleton<IImageFinder, ImageFinder>();
+        services.AddSingleton<IImageCopier, ImageCopier>();
         services.AddSingleton<IImageOrganizer, ImageOrganizer>();
         services.AddSingleton<ICompressor, Compressor>();
-        services.AddSingleton<IArchiveOperationSelector, ArchiveOperationSelector>();
         services.AddSingleton<ICancellationTokenSourceProvider, CancellationTokenSourceProvider>();
 
         // ViewModels

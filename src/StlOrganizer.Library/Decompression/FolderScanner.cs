@@ -2,15 +2,13 @@
 
 namespace StlOrganizer.Library.Decompression;
 
-using OperationSelection;
-
 public class FolderScanner(
     IFileSystem fileSystem,
     IDecompressor decompressor) : IFolderScanner
 {
     public async Task FindAndDecompress(
         string folder,
-        IProgress<OrganizerProgress> progress,
+        IProgress<DecompressionProgress> progress,
         CancellationToken cancellationToken = default)
     {
         const string extensionToFind = "*.zip";
@@ -27,14 +25,14 @@ public class FolderScanner(
         foreach (var file in archives)
         {
             count++;
-            progress.Report(new OrganizerProgress
+            progress.Report(new DecompressionProgress
             {
-                Message = $"Decompressing {file} archives.",
+                Message = $"Decompressing {file}.",
                 Progress = (int)((double)count / archives.Count * 100)
             });
 
-            var fileNameWithoutExtension = fileSystem.GetFileNameWithoutExtension(file);
-            var outputPath = fileSystem.CombinePaths(folder, fileNameWithoutExtension);
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+            var outputPath = Path.Combine(folder, fileNameWithoutExtension);
             await decompressor.DecompressAsync(file, outputPath, cancellationToken);
         }
     }

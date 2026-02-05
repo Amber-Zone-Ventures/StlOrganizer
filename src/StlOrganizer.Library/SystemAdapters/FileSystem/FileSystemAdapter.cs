@@ -23,10 +23,4 @@ public class FileSystemAdapter(IFileOperations fileOperations) : IFileSystem
 
         return Path.GetFileName(path);
     }
-
-    public string CombinePaths(params string[] paths) => Path.Combine(paths);
-
-    public string GetFileNameWithoutExtension(string path) => Path.GetFileNameWithoutExtension(path);
-
-    public string GetExtension(string path) => Path.GetExtension(path);
 }
